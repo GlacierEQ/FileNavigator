@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -89,7 +90,7 @@ internal class BatchMoveService : LoggingUnboundService() {
         }
     }
 
-    private suspend fun CoroutineScope.performBatchMove(
+    private suspend fun performBatchMove(
         bundles: List<MoveOperation.Batchable>,
         destination: MoveDestination.Directory,
         context: Context,
@@ -99,7 +100,7 @@ internal class BatchMoveService : LoggingUnboundService() {
         return buildList {
             try {
                 bundles.forEachIndexed { index, operation ->
-                    ensureActive()
+                    currentCoroutineContext().ensureActive()
 
                     operation.file.moveTo(
                         destination = destination,

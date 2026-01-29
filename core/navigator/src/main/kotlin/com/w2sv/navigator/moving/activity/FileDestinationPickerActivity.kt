@@ -11,7 +11,6 @@ import com.w2sv.common.logging.log
 import com.w2sv.common.uri.DocumentUri
 import com.w2sv.common.uri.documentUri
 import com.w2sv.common.util.takePersistableReadAndWriteUriPermission
-import com.w2sv.kotlinutils.coroutines.flow.emit
 import com.w2sv.kotlinutils.threadUnsafeLazy
 import com.w2sv.navigator.domain.moving.DestinationSelectionManner
 import com.w2sv.navigator.domain.moving.MoveDestination
@@ -19,10 +18,11 @@ import com.w2sv.navigator.domain.moving.MoveFile
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.notifications.CancelNotificationEvent
 import com.w2sv.navigator.moving.MoveBroadcastReceiver
-import com.w2sv.navigator.observing.MediaIdWithMediaType
+import com.w2sv.navigator.shared.created_files.EmitSelfCreatedFile
+import com.w2sv.navigator.shared.created_files.SelfCreatedFileIdentifiers
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import slimber.log.i
 
@@ -30,14 +30,14 @@ import slimber.log.i
 internal class FileDestinationPickerActivity : DestinationPickerActivityApi() {
 
     @Inject
-    lateinit var blacklistedMediaUris: MutableSharedFlow<MediaIdWithMediaType>
+    lateinit var publishSelfCreatedFile: EmitSelfCreatedFile
 
     private val args: Args by threadUnsafeLazy {
         checkNotNull(intent.getParcelableCompat<Args>(DestinationPickerActivityApi.Args.EXTRA))
     }
 
     override fun launchPicker() {
-        documentCreator.launch(args.moveFile.mediaStoreData.name)
+        documentCreator.launch(args.moveFile.mediaStoreEntry.fileName)
     }
 
     /**
@@ -90,14 +90,15 @@ internal class FileDestinationPickerActivity : DestinationPickerActivityApi() {
     }
 
     private fun blacklistCreatedFileDestination(destination: MoveDestination.File.Local) {
-        blacklistedMediaUris.emit(
-            value = MediaIdWithMediaType(
-                mediaId = checkNotNull(destination.mediaUri.id()),
-                mediaType = args.moveFile.fileType.mediaType
+        lifecycleScope.launch {
+            publishSelfCreatedFile(
+                SelfCreatedFileIdentifiers(
+                    mediaId = checkNotNull(destination.mediaUri.id()),
+                    mediaType = args.moveFile.fileType.mediaType
+                )
+                    .log { "Publishing $it as SelfCreatedMediaId" }
             )
-                .log { "Emitting $it to blacklist" },
-            scope = lifecycleScope
-        )
+        }
     }
 
     @Parcelize

@@ -58,7 +58,7 @@ sealed interface MoveOperation : Parcelable {
 
     fun movedFile(context: Context, dateTime: LocalDateTime): MovedFile {
         val name = destination.fileName(context)
-        val originalName = file.mediaStoreData.name.takeIf { it != name }
+        val originalName = file.mediaStoreEntry.fileName.takeIf { it != name }
         return when (val capturedDestination = destination) {
             is MoveDestination.File.Local -> {
                 MovedFile.Local(
@@ -86,7 +86,7 @@ sealed interface MoveOperation : Parcelable {
             }
 
             is MoveDestination.Directory -> {
-                val movedFileDocumentUri = destination.documentUri.constructChildDocumentUri(fileName = file.mediaStoreData.name)
+                val movedFileDocumentUri = destination.documentUri.constructChildDocumentUri(fileName = file.mediaStoreEntry.fileName)
                 MovedFile.Local(
                     documentUri = movedFileDocumentUri,
                     mediaUri = movedFileMediaUri(
@@ -95,7 +95,7 @@ sealed interface MoveOperation : Parcelable {
                         fileHasBeenAutoMoved = destinationSelectionManner.isAuto,
                         context = context
                     ),
-                    name = file.mediaStoreData.name,
+                    name = file.mediaStoreEntry.fileName,
                     originalName = null,
                     fileType = file.fileType,
                     sourceType = file.sourceType,
@@ -142,7 +142,7 @@ private fun movedFileMediaUri(
             null
         }
 
-        reconstructedDocumentUri.fileName(context) == moveFile.mediaStoreData.name -> {
+        reconstructedDocumentUri.fileName(context) == moveFile.mediaStoreEntry.fileName -> {
             i { "File name corresponding to the reconstructed document Uri matches the original one" }
             mediaUri
         }
@@ -153,7 +153,7 @@ private fun movedFileMediaUri(
                     reconstructedDocumentUri.fileName(
                         context
                     )
-                } does not match original file name=${moveFile.mediaStoreData.name}"
+                } does not match original file name=${moveFile.mediaStoreEntry.fileName}"
             }
             null
         }

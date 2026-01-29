@@ -25,7 +25,7 @@ value class MediaUri(val uri: Uri) : Parcelable {
         }
 
     fun id(): MediaId? =
-        MediaId.Companion.parseFromUri(uri)
+        MediaId.parseFromUri(uri)
 
     fun idIncremented(): MediaUri? =
         id()?.let { nonNullId -> parse("${uri.toString().substringBeforeLast("/")}/${nonNullId.value + 1}") }

@@ -13,14 +13,14 @@ import com.w2sv.domain.model.filetype.SourceType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MoveFile(val mediaUri: MediaUri, val mediaStoreData: MediaStoreFileData, val fileAndSourceType: FileAndSourceType) :
+data class MoveFile(val mediaUri: MediaUri, val mediaStoreEntry: MediaStoreEntry, val fileAndSourceType: FileAndSourceType) :
     Parcelable {
 
     fun mediaFile(context: Context): MediaFile? =
         MediaStoreCompat.fromMediaId(
             context = context,
             mediaType = mediaType,
-            id = mediaStoreData.rowId
+            id = mediaStoreEntry.rowId
         )
 
     val fileType: FileType
@@ -33,5 +33,5 @@ data class MoveFile(val mediaUri: MediaUri, val mediaStoreData: MediaStoreFileDa
         get() = fileType.mediaType
 
     val isGif: Boolean
-        get() = fileType.wrappedPresetTypeOrNull is PresetFileType.Image && mediaStoreData.extension.lowercase() == "gif"
+        get() = fileType.wrappedPresetTypeOrNull is PresetFileType.Image && mediaStoreEntry.fileExtension.lowercase() == "gif"
 }

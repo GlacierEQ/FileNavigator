@@ -9,68 +9,61 @@ import com.w2sv.androidutils.database.getBooleanOrThrow
 import com.w2sv.androidutils.database.getLongOrThrow
 import com.w2sv.androidutils.database.getStringOrThrow
 import com.w2sv.androidutils.database.query
-import com.w2sv.common.logging.log
 import com.w2sv.common.uri.MediaUri
 import com.w2sv.domain.model.filetype.SourceType
 import java.io.File
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
-import slimber.log.i
+import slimber.log.e
 
 /**
- * @param volumeRelativeDirPath Relative to the storage volume, e.g. "Documents/", "DCIM/Camera/".
+ * @property rowId queried via [MediaStore.MediaColumns._ID]
+ * @property absPath queried via [MediaStore.MediaColumns.DATA]
+ * @property relativePath queried via [MediaStore.MediaColumns.RELATIVE_PATH]. Path relative to the storage volume,
+ * e.g. "Documents/", "DCIM/Camera/".
+ * @property size queried via [MediaStore.MediaColumns.SIZE]
+ * @property isPending queried via [MediaStore.MediaColumns.IS_PENDING]
+ * @property isTrashed queried via [MediaStore.MediaColumns.IS_TRASHED]
  */
 @Parcelize
-data class MediaStoreFileData(
+data class MediaStoreEntry(
     val rowId: String,
     val absPath: String,
-    val volumeRelativeDirPath: String,
+    val relativePath: String,
     val size: Long,
     val isPending: Boolean,
     val isTrashed: Boolean
 ) : Parcelable {
 
-    @IgnoredOnParcel
-    val name: String by lazy {
-        absPath.substringAfterLast(File.separator)
-    }
+    val fileName: String
+        get() = absPath.substringAfterLast(File.separator)
 
     /**
      * Equals empty string if no extension present (=> directory).
      */
-    @IgnoredOnParcel
-    val extension: String by lazy {
-        name.substringAfterLast(".", "")
-    }
+    val fileExtension: String
+        get() = fileName.substringAfterLast(".", "")
 
-    @IgnoredOnParcel
-    val parentDirName: String by lazy {
-        volumeRelativeDirPath
+    val parentDirName: String
+        get() = relativePath
             .removeSuffix(File.separator)
             .substringAfterLast(File.separator)
-    }
 
-    @IgnoredOnParcel
-    val file: File by lazy {
+    fun file(): File =
         File(absPath)
-    }
 
-    val fileExists: Boolean
-        get() = file.exists()
+    fun fileExists(): Boolean =
+        file().exists()
 
     fun sourceType(): SourceType =
         when {
-            volumeRelativeDirPath.contains(directoryRecordingsCompat) -> SourceType.Recording
+            relativePath.contains(directoryRecordingsCompat) -> SourceType.Recording
             // NOTE: Don't change the order of the Screenshot and Camera branches, as Environment.DIRECTORY_SCREENSHOTS
             // may be a child dir of Environment.DIRECTORY_DCIM
-            volumeRelativeDirPath.contains(Environment.DIRECTORY_SCREENSHOTS) -> SourceType.Screenshot
-            volumeRelativeDirPath.contains(Environment.DIRECTORY_DCIM) -> SourceType.Camera
-            volumeRelativeDirPath.contains(Environment.DIRECTORY_DOWNLOADS) -> SourceType.Download
+            relativePath.contains(Environment.DIRECTORY_SCREENSHOTS) -> SourceType.Screenshot
+            relativePath.contains(Environment.DIRECTORY_DCIM) -> SourceType.Camera
+            relativePath.contains(Environment.DIRECTORY_DOWNLOADS) -> SourceType.Download
             else -> SourceType.OtherApp
         }
-            .also {
-                i { "Determined Source.Kind: ${it.name}" }
-            }
 
     companion object {
         private val queryColumns = arrayOf(
@@ -82,24 +75,20 @@ data class MediaStoreFileData(
             MediaStore.MediaColumns.IS_TRASHED
         )
 
-        fun queryFor(mediaUri: MediaUri, contentResolver: ContentResolver): MediaStoreFileData? =
+        fun queryFor(mediaUri: MediaUri, contentResolver: ContentResolver): MediaStoreEntry? =
             try {
-                contentResolver.query(
-                    uri = mediaUri.uri,
-                    columns = queryColumns
-                ) {
-                    MediaStoreFileData(
+                contentResolver.query(uri = mediaUri.uri, columns = queryColumns) {
+                    MediaStoreEntry(
                         rowId = it.getStringOrThrow(MediaStore.MediaColumns._ID),
                         absPath = it.getStringOrThrow(MediaStore.MediaColumns.DATA),
-                        volumeRelativeDirPath = it.getStringOrThrow(MediaStore.MediaColumns.RELATIVE_PATH),
+                        relativePath = it.getStringOrThrow(MediaStore.MediaColumns.RELATIVE_PATH),
                         size = it.getLongOrThrow(MediaStore.MediaColumns.SIZE),
                         isPending = it.getBooleanOrThrow(MediaStore.MediaColumns.IS_PENDING),
                         isTrashed = it.getBooleanOrThrow(MediaStore.MediaColumns.IS_TRASHED)
                     )
-                        .log()
                 }
             } catch (e: Exception) {
-//                emitDiscardedLog(e::toString)
+                e(e)
                 null
             }
     }

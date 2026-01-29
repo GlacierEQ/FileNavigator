@@ -1,24 +1,21 @@
 package com.w2sv.navigator.observing
 
-import android.content.ContentResolver
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
 import com.anggrayudi.storage.media.MediaType
-import com.w2sv.common.logging.log
 import com.w2sv.common.uri.MediaId
+import com.w2sv.common.uri.MediaUri
 import com.w2sv.common.uri.mediaUri
 import com.w2sv.domain.model.filetype.FileAndSourceType
 import com.w2sv.domain.model.navigatorconfig.AutoMoveConfig
 import com.w2sv.kotlinutils.coroutines.flow.collectOn
-import com.w2sv.kotlinutils.coroutines.launchDelayed
 import com.w2sv.navigator.domain.moving.DestinationSelectionManner
-import com.w2sv.navigator.domain.moving.MediaStoreFileData
+import com.w2sv.navigator.domain.moving.MediaStoreEntry
 import com.w2sv.navigator.domain.moving.MoveDestination
 import com.w2sv.navigator.domain.moving.MoveFile
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.notifications.NotificationEvent
-import com.w2sv.navigator.moving.MoveBroadcastReceiver
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -26,143 +23,201 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import slimber.log.i
 
-private data class MoveFileWithProcedureJob(val moveFile: MoveFile, val procedureJob: Job)
-
-private const val CANCEL_PERIOD_MILLIS = 300L
-
-private enum class FileChangeOperation(private val flag: Int?) {
-
-    // Note: don't change the enum entry order, as the working of determine(Int): FileChangeOperation depends on it!!!
-    Update(ContentResolver.NOTIFY_UPDATE),
-    Insert(ContentResolver.NOTIFY_INSERT),
-    Delete(ContentResolver.NOTIFY_DELETE),
-    Unclassified(null);
-
-    companion object {
-        operator fun invoke(contentObserverOnChangeFlags: Int): FileChangeOperation =
-            entries.first { it.flag == null || it.flag and contentObserverOnChangeFlags != 0 }
-    }
-}
-
-internal abstract class FileObserver(val mediaType: MediaType, handler: Handler, environment: FileObserverEnvironment) :
+internal abstract class FileObserver(val mediaType: MediaType, blacklistSize: Int, handler: Handler, environment: FileObserverEnvironment) :
     ContentObserver(handler),
     FileObserverEnvironment by environment {
 
-    private val mediaIdBlacklist = RecentSet<MediaId>(3)
-    private var moveFileWithProcedureJob: MoveFileWithProcedureJob? = null
+    /**
+     * Contains IDs of files that either
+     * - have been created by the app during the move operation
+     * - don't match the file and source type settings the observer has been registered for
+     * - a procedure job has already been triggered for
+     */
+    private val blacklist = RecentSet<MediaId>(blacklistSize)
+
+    private val pendingJobs = mutableMapOf<MediaId, Job>()
 
     open val logIdentifier: String
         get() = this::class.java.simpleName
 
     init {
-        blacklistedMediaUris
+        blacklistFilteredSelfCreatedFiles()
+    }
+
+    private fun blacklistFilteredSelfCreatedFiles() {
+        selfCreatedFiles
+            .flow
             .filter { it.mediaType == mediaType }
             .map { it.mediaId }
             .collectOn(scope) { mediaId ->
-                i { "Collected $mediaId" }
-                mediaIdBlacklist.add(mediaId)
-                if (moveFileWithProcedureJob?.moveFile?.mediaUri?.id() == mediaId) {
-                    cancelAndResetMoveFileProcedureJob()
-                }
+                log { "Collected $mediaId" }
+                blacklist.add(mediaId)
+                // If media id of a self created file corresponds to a pending job, cancel & remove it
+                cancelAndRemovePendingJob(mediaId)
             }
     }
 
     final override fun deliverSelfNotifications(): Boolean =
         false
 
-    private fun cancelAndResetMoveFileProcedureJob() {
-        moveFileWithProcedureJob?.procedureJob?.cancel()
-        moveFileWithProcedureJob = null
-    }
+    // ===================
+    //  onChange
+    // ===================
 
-    override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
-        when (FileChangeOperation(flags).also { emitOnChangeLog(uri, it) }) {
-            FileChangeOperation.Insert -> Unit
-            FileChangeOperation.Update, FileChangeOperation.Unclassified -> onChangeCore(uri)
-            FileChangeOperation.Delete -> cancelAndResetMoveFileProcedureJob()
-        }
-    }
+    final override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
+        onChangeLog(uris = uri.toString(), flags = flags)
 
-    override fun onChange(selfChange: Boolean, uri: Uri?) {
-        emitOnChangeLog(uri, FileChangeOperation.Unclassified)
-        onChangeCore(uri)
-    }
-
-    private fun emitOnChangeLog(uri: Uri?, fileChangeOperation: FileChangeOperation) {
-        i { "$logIdentifier ${fileChangeOperation.name} $uri | Blacklist: $mediaIdBlacklist" }
-    }
-
-    private fun onChangeCore(uri: Uri?) {
-        val mediaUri = uri?.mediaUri ?: return
-
-        val mediaId = mediaUri.id() ?: run {
-            i { "mediaId null; discarding" }
-            return
-        }
-        // Exit if in mediaUriBlacklist
-        if (mediaIdBlacklist.contains(mediaId)) {
-            i { "Found $mediaId in blacklist; discarding" }
-            return
-        }
-
-        val mediaStoreDataRetrievalResult = mediaStoreDataProducer(
-            mediaUri = mediaUri,
-            contentResolver = context.contentResolver
-        )
-            .asSuccessOrNull ?: return
-
-        moveFileWithProcedureJob?.run {
-            val (moveFile, procedureJob) = this
-            if (mediaStoreDataRetrievalResult.isUpdateOfAlreadySeenFile && mediaUri == moveFile.mediaUri) {
-                procedureJob.cancel()
-            }
-        }
-
-        matchingFileAndSourceTypeOrNull(mediaStoreDataRetrievalResult.data)?.let { fileAndSourceType ->
-            val moveFile = MoveFile(
-                mediaUri = mediaUri,
-                mediaStoreData = mediaStoreDataRetrievalResult.data,
-                fileAndSourceType = fileAndSourceType
-            )
-                .log { "Calling onMoveFile on $it" }
-
-            scope.launch {
-                // TODO maybe cache via StateFlows
-                val enabledAutoMoveDestinationOrNull = navigatorConfigFlow
-                    .first()
-                    .autoMoveConfig(
-                        fileType = moveFile.fileType,
-                        sourceType = moveFile.sourceType
-                    )
-                    .enabledDestinationOrNull
-
-                moveFileWithProcedureJob = MoveFileWithProcedureJob(
-                    moveFile = moveFile,
-                    procedureJob = scope.launchDelayed(CANCEL_PERIOD_MILLIS) {
-                        enabledAutoMoveDestinationOrNull?.let {
-                            // TODO Why not perform the moving directly instead of starting a receiver with parceling
-                            MoveBroadcastReceiver.sendBroadcast(
-                                operation = MoveOperation.AutoMove(
-                                    file = moveFile,
-                                    destination = enabledAutoMoveDestinationOrNull,
-                                    destinationSelectionManner = DestinationSelectionManner.Auto
-                                ),
-                                context = context
-                            )
-                        } ?: run {
-                            notificationEventHandler(NotificationEvent.PostMoveFile(moveFile))
-                        }
-                    }
-                )
+        withMediaUriAndId(uri) { mediaUri, mediaId ->
+            when (FileChangeEvent.parseFrom(flags)) {
+                FileChangeEvent.Update -> onChangeCore(mediaUri, mediaId)
+                FileChangeEvent.Delete -> cancelAndRemovePendingJob(mediaId)
+                else -> Unit
             }
         }
     }
 
     /**
-     * This method determines whether the observer will fire for the received [mediaStoreFileData] or not.
+     * Called on android versions that don't provide notify flags.
      */
-    protected abstract fun matchingFileAndSourceTypeOrNull(mediaStoreFileData: MediaStoreFileData): FileAndSourceType?
+    final override fun onChange(selfChange: Boolean, uri: Uri?) {
+        onChangeLog(uri.toString(), null)
+        withMediaUriAndId(uri, ::onChangeCore)
+    }
+
+    /**
+     * Logs and calls super implementation.
+     */
+    final override fun onChange(selfChange: Boolean, uris: Collection<Uri?>, flags: Int) {
+        onChangeLog(uris.toString(), flags)
+        super.onChange(selfChange, uris, flags)
+    }
+
+    private fun onChangeCore(mediaUri: MediaUri, mediaId: MediaId) {
+        if (blacklist.contains(mediaId)) return discardedLog { "mediaId blacklisted" }
+
+        val mediaStoreEntry = validMediaStoreEntryOrNull(mediaUri)?.also { log { "$it" } } ?: return
+        val fileAndSourceType = enabledFileAndSourceTypeOrNull(mediaStoreEntry) ?: return run {
+            discardedLog { "Couldn't find matching fileAndSourceType - Adding $mediaId to blacklist" }
+            blacklist.add(mediaId)
+        }
+
+        log { "Found matching fileAndSourceType $fileAndSourceType" }
+        scope.launch { promptNavigationWhenMediaStoreEntryStable(mediaId, mediaUri, fileAndSourceType) }
+    }
+
+    /**
+     * Returns the [FileAndSourceType] corresponding to the [mediaStoreEntry] IF it matches the user's settings.
+     * This is what decides if a procedure is triggered for a file or not.
+     */
+    protected abstract fun enabledFileAndSourceTypeOrNull(mediaStoreEntry: MediaStoreEntry): FileAndSourceType?
+
+    private fun promptNavigationWhenMediaStoreEntryStable(mediaId: MediaId, mediaUri: MediaUri, fileAndSourceType: FileAndSourceType) {
+        val cancelledJob = cancelAndRemovePendingJob(mediaId)
+        log {
+            if (cancelledJob) {
+                "Relaunching awaitStableMediaStoreData for $mediaId"
+            } else {
+                "Launching awaitStableMediaStoreData for $mediaId"
+            }
+        }
+
+        pendingJobs[mediaId] = scope.launch {
+            try {
+                awaitStableMediaStoreEntry(
+                    provideEntry = { validMediaStoreEntryOrNull(mediaUri) },
+                    log = ::log
+                )?.let { mediaStoreEntry ->
+                    val moveFile = MoveFile(
+                        mediaUri = mediaUri,
+                        mediaStoreEntry = mediaStoreEntry,
+                        fileAndSourceType = fileAndSourceType
+                    )
+                    log { "Calling promptFileNavigation for $moveFile" }
+                    promptNavigation(moveFile)
+
+                    log { "Completed job for $mediaId - Adding to blacklist" }
+                    blacklist.add(mediaId)
+                }
+            } finally {
+                pendingJobs.remove(mediaId)
+            }
+        }
+    }
+
+    private suspend fun promptNavigation(moveFile: MoveFile) {
+        // TODO maybe cache via StateFlows
+        val autoMoveDestination = navigatorConfigFlow
+            .first()
+            .autoMoveConfig(moveFile.fileType, moveFile.sourceType)
+            .enabledDestinationOrNull
+
+        // Perform auto move or post move file notification
+        if (autoMoveDestination == null) {
+            log { "Posting move file notification for $moveFile" }
+            notificationEventHandler(NotificationEvent.PostMoveFile(moveFile))
+        } else {
+            log { "Performing auto move for $moveFile" }
+            fileMover(
+                operation = MoveOperation.AutoMove(
+                    file = moveFile,
+                    destination = autoMoveDestination,
+                    destinationSelectionManner = DestinationSelectionManner.Auto
+                ),
+                context = context
+            )
+        }
+    }
+
+    // ===================
+    //  Helpers
+    // ===================
+
+    /**
+     * Invokes [block] with converted mediaUri & mediaId or logs and returns if either the passed [uri]
+     * or the parsed mediaId is null.
+     */
+    private fun withMediaUriAndId(uri: Uri?, block: (MediaUri, MediaId) -> Unit) {
+        val mediaUri = uri?.mediaUri ?: return discardedLog { "uri null" }
+        val mediaId = mediaUri.id() ?: return discardedLog { "mediaId null" }
+        block(mediaUri, mediaId)
+    }
+
+    private fun cancelAndRemovePendingJob(mediaId: MediaId): Boolean {
+        val cancelledJob = pendingJobs[mediaId]?.apply {
+            log { "Cancelling pending job for $mediaId" }
+            cancel()
+        } != null
+        pendingJobs.remove(mediaId)
+        return cancelledJob
+    }
+
+    private fun validMediaStoreEntryOrNull(mediaUri: MediaUri): MediaStoreEntry? {
+        val data = MediaStoreEntry.queryFor(mediaUri, context.contentResolver)
+
+        return when {
+            data == null -> null.also { discardedLog { "couldn't query MediaStoreFileData" } }
+            data.isPending -> null.also { discardedLog { "file pending" } }
+            data.isTrashed -> null.also { discardedLog { "file trashed" } }
+            else -> data
+        }
+    }
+
+    // ===================
+    //  Logging
+    // ===================
+
+    protected fun log(message: () -> String) {
+        i { "$logIdentifier - ${message()}" }
+    }
+
+    protected fun discardedLog(reason: () -> String) {
+        log { "Discarded file: ${reason()}" }
+    }
+
+    private fun onChangeLog(uris: String, flags: Int?) {
+        log { "onChange flags=${flags?.let { FileChangeEvent.describeNotifyFlags(it) }} | $uris | blacklist=$blacklist" }
+    }
 }
 
 private val AutoMoveConfig.enabledDestinationOrNull: MoveDestination.Directory?
-    get() = if (enabled && destination != null) MoveDestination.Directory(destination!!) else null
+    get() = destination?.takeIf { enabled }?.run(MoveDestination::Directory)

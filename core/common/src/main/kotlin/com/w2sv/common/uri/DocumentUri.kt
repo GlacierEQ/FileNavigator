@@ -36,11 +36,13 @@ value class DocumentUri(val uri: Uri) : Parcelable {
      * Invokes [DocumentFile.fromTreeUri] if [isDocumentTreeUri] returns true, otherwise [DocumentFile.fromSingleUri].
      */
     fun documentFile(context: Context): DocumentFile =
-        if (isDocumentTreeUri) {
-            DocumentFile.fromTreeUri(context, uri)
-        } else {
-            DocumentFile.fromSingleUri(context, uri)
-        }!!
+        checkNotNull(
+            if (isDocumentTreeUri) {
+                DocumentFile.fromTreeUri(context, uri)
+            } else {
+                DocumentFile.fromSingleUri(context, uri)
+            }
+        )
 
     /**
      * Does not depend on the file corresponding to [uri] being present.

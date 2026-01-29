@@ -26,7 +26,7 @@ internal suspend fun MoveFile.moveTo(
     val mediaFile = mediaFile(context)
 
     when {
-        !mediaStoreData.fileExists -> onResult(MoveResult.MoveFileNotFound)
+        !mediaStoreEntry.fileExists() -> onResult(MoveResult.MoveFileNotFound)
         !hasManageAllFilesPermission -> onResult(MoveResult.ManageAllFilesPermissionMissing)
         mediaFile == null -> onResult(MoveResult.InternalError)
 
@@ -36,7 +36,10 @@ internal suspend fun MoveFile.moveTo(
             onResult = onResult
         )
 
-        destinationDocumentFile.hasChild(context = context, path = mediaStoreData.name) -> onResult(MoveResult.FileAlreadyAtDestination)
+        destinationDocumentFile.hasChild(
+            context = context,
+            path = mediaStoreEntry.fileName
+        ) -> onResult(MoveResult.FileAlreadyAtDestination)
 
         destination.isDirectory -> mediaFile.moveToFolder(
             folderDestination = destinationDocumentFile,

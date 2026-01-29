@@ -22,7 +22,7 @@ internal class FileObserverProvider @Inject constructor(
 
         return buildList {
             addAll(mediaObservers(navigatorConfig, handler))
-            nonMediaObserver(navigatorConfig, handler)?.let(::add)
+            downloadsObserver(navigatorConfig, handler)?.let(::add)
         }
     }
 
@@ -31,26 +31,32 @@ internal class FileObserverProvider @Inject constructor(
             .enabledFileTypes
             .filter { it.isMediaType }
             .map { fileType ->
+                val sourceTypes = navigatorConfig.fileTypeConfig(fileType).sourceTypeConfigMap.filterKeysByValueToSet { it.enabled }
                 MediaFileObserver(
                     fileType = fileType,
-                    enabledSourceTypes = navigatorConfig.fileTypeConfig(fileType).sourceTypeConfigMap.filterKeysByValueToSet { it.enabled },
+                    enabledSourceTypes = sourceTypes,
                     handler = handler,
                     environment = environment
                 )
+                    .log { "Provided ${it.logIdentifier} | sourceTypes=$sourceTypes" }
             }
 
-    private fun nonMediaObserver(navigatorConfig: NavigatorConfig, handler: Handler): NonMediaFileObserver? =
+    private fun downloadsObserver(navigatorConfig: NavigatorConfig, handler: Handler): DownloadsObserver? =
         navigatorConfig
             .enabledFileTypes
             .filter { !it.isMediaType }
             .let { enabledNonMediaTypes ->
                 if (enabledNonMediaTypes.isNotEmpty()) {
-                    NonMediaFileObserver(
+                    DownloadsObserver(
                         fileTypes = enabledNonMediaTypes,
                         handler = handler,
                         environment = environment
                     )
-                        .log { "Provided ${it.logIdentifier} | fileTypes=$enabledNonMediaTypes" }
+                        .log {
+                            "Provided ${it.logIdentifier} | fileTypes=${enabledNonMediaTypes.map { fileType ->
+                                fileType.wrappedPresetTypeOrNull
+                            }}"
+                        }
                 } else {
                     null
                 }

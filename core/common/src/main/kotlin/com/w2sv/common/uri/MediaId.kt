@@ -8,14 +8,13 @@ import slimber.log.e
 value class MediaId(val value: Long) {
 
     companion object {
+        /**
+         * @see ContentUris.parseId
+         */
         fun parseFromUri(uri: Uri): MediaId? =
             try {
                 val parsedId = ContentUris.parseId(uri)
-                if (parsedId != -1L) {
-                    MediaId(parsedId)
-                } else {
-                    null
-                }
+                parsedId.takeIf { it != -1L }?.run(::MediaId)
             } catch (e: Exception) {
                 e { e.stackTraceToString() }
                 null

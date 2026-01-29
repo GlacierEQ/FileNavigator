@@ -13,35 +13,35 @@ internal class MediaStoreFileDataTest {
 
     @Test
     fun testName() {
-        assertEquals("somepicture.jpg", TestInstance.mediaStoreFileData.name)
+        assertEquals("somepicture.jpg", TestInstance.mediaStoreEntry.fileName)
     }
 
     @Test
     fun testParcelling() {
-        TestInstance.mediaStoreFileData.testParceling()
+        TestInstance.mediaStoreEntry.testParceling()
     }
 
     @Test
     fun testFileExtension() {
-        assertEquals("jpg", TestInstance.mediaStoreFileData.extension)
+        assertEquals("jpg", TestInstance.mediaStoreEntry.fileExtension)
         assertEquals(
             "",
             TestInstance.mediaStoreFileData(
                 absPath = "primary/0/DCIM",
                 volumeRelativeDirPath = "DCIM/"
             )
-                .extension
+                .fileExtension
         )
     }
 
     @Test
     fun testParentDirName() {
-        assertEquals("Screenshots", TestInstance.mediaStoreFileData.parentDirName)
+        assertEquals("Screenshots", TestInstance.mediaStoreEntry.parentDirName)
     }
 
     @Test
     fun testSourceType() {
-        assertEquals(SourceType.Screenshot, TestInstance.mediaStoreFileData.sourceType())
+        assertEquals(SourceType.Screenshot, TestInstance.mediaStoreEntry.sourceType())
         assertEquals(
             SourceType.Camera,
             TestInstance.mediaStoreFileData(

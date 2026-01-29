@@ -4,15 +4,15 @@ import com.w2sv.common.uri.MediaUri
 import com.w2sv.domain.model.filetype.FileAndSourceType
 import com.w2sv.domain.model.filetype.PresetFileType
 import com.w2sv.domain.model.filetype.SourceType
-import com.w2sv.navigator.domain.moving.MediaStoreFileData
+import com.w2sv.navigator.domain.moving.MediaStoreEntry
 import com.w2sv.navigator.domain.moving.MoveFile
 
 internal object TestInstance {
 
-    val mediaStoreFileData = MediaStoreFileData(
+    val mediaStoreEntry = MediaStoreEntry(
         rowId = "1000012597",
         absPath = "primary/0/DCIM/Screenshots/somepicture.jpg",
-        volumeRelativeDirPath = "DCIM/Screenshots",
+        relativePath = "DCIM/Screenshots",
         size = 7862183L,
         isPending = false,
         isTrashed = false
@@ -25,11 +25,11 @@ internal object TestInstance {
         size: Long = 7862183L,
         isPending: Boolean = false,
         isTrashed: Boolean = false
-    ): MediaStoreFileData =
-        MediaStoreFileData(
+    ): MediaStoreEntry =
+        MediaStoreEntry(
             rowId = rowId,
             absPath = absPath,
-            volumeRelativeDirPath = volumeRelativeDirPath,
+            relativePath = volumeRelativeDirPath,
             size = size,
             isPending = isPending,
             isTrashed = isTrashed
@@ -37,7 +37,7 @@ internal object TestInstance {
 
     fun moveFile(
         mediaUri: MediaUri = MediaUri.parse("content://media/external/images/media/1000012597"),
-        mediaStoreFileData: MediaStoreFileData = this.mediaStoreFileData,
+        mediaStoreEntry: MediaStoreEntry = this.mediaStoreEntry,
         fileAndSourceType: FileAndSourceType = FileAndSourceType(
             fileType = PresetFileType.Image.toFileType(),
             sourceType = SourceType.Screenshot
@@ -45,7 +45,7 @@ internal object TestInstance {
     ): MoveFile =
         MoveFile(
             mediaUri = mediaUri,
-            mediaStoreData = mediaStoreFileData,
+            mediaStoreEntry = mediaStoreEntry,
             fileAndSourceType = fileAndSourceType
         )
 }

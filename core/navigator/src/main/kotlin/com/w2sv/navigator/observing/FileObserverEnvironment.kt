@@ -4,10 +4,11 @@ import android.content.Context
 import com.w2sv.common.di.ApplicationIoScope
 import com.w2sv.domain.model.navigatorconfig.NavigatorConfigFlow
 import com.w2sv.navigator.domain.notifications.NotificationEventHandler
+import com.w2sv.navigator.moving.FileMover
+import com.w2sv.navigator.shared.created_files.SelfCreatedFiles
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharedFlow
 
 /**
  * Bundles shared infrastructure needed by all [FileObserver] instances.
@@ -18,17 +19,17 @@ import kotlinx.coroutines.flow.SharedFlow
 internal interface FileObserverEnvironment {
     val context: Context
     val scope: CoroutineScope
-    val mediaStoreDataProducer: MediaStoreDataProducer
-    val blacklistedMediaUris: SharedFlow<MediaIdWithMediaType>
+    val selfCreatedFiles: SelfCreatedFiles
     val notificationEventHandler: NotificationEventHandler
     val navigatorConfigFlow: NavigatorConfigFlow
+    val fileMover: FileMover
 }
 
 internal class FileObserverEnvironmentImpl @Inject constructor(
     @ApplicationContext override val context: Context,
     @ApplicationIoScope override val scope: CoroutineScope,
-    override val mediaStoreDataProducer: MediaStoreDataProducer,
-    override val blacklistedMediaUris: SharedFlow<MediaIdWithMediaType>,
+    override val selfCreatedFiles: SelfCreatedFiles,
     override val notificationEventHandler: NotificationEventHandler,
-    override val navigatorConfigFlow: NavigatorConfigFlow
+    override val navigatorConfigFlow: NavigatorConfigFlow,
+    override val fileMover: FileMover
 ) : FileObserverEnvironment

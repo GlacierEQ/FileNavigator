@@ -236,16 +236,16 @@ private fun MoveFile.largeNotificationIcon(context: Context): Bitmap? =
 
 private fun MoveFile.notificationContentText(context: Context): SpannedString =
     buildSpannedString {
-        append(mediaStoreData.name.lineBreakSuffixed())
+        append(mediaStoreEntry.fileName.lineBreakSuffixed())
         bold { append(context.getString(R.string.directory).lineBreakSuffixed()) }
         append(
-            mediaStoreData.volumeRelativeDirPath
+            mediaStoreEntry.relativePath
                 .removeSlashSuffix()
                 .slashPrefixed()
                 .lineBreakSuffixed()
         )
         bold { append(context.getString(R.string.size).lineBreakSuffixed()) }
-        append(formattedFileSize(mediaStoreData.size))
+        append(formattedFileSize(mediaStoreEntry.size))
     }
 
 private fun MoveFile.notificationTitle(context: Context): String =
@@ -276,7 +276,7 @@ private fun MoveFile.notificationLabel(context: Context): String =
                     fileType.label(context)
                 )
 
-                SourceType.OtherApp -> "/${mediaStoreData.parentDirName} ${fileType.label(context)}"
+                SourceType.OtherApp -> "/${mediaStoreEntry.parentDirName} ${fileType.label(context)}"
             }
         }
     }

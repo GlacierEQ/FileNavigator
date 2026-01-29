@@ -62,4 +62,4 @@ private val MoveFileNotificationData.mimeType: String
     get() = moveFile.fileType.mediaType.mimeType
 
 private val MoveFileNotificationData.absPath: String
-    get() = moveFile.mediaStoreData.absPath
+    get() = moveFile.mediaStoreEntry.absPath

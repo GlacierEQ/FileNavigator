@@ -59,7 +59,7 @@ internal class FileDeletionActivity : LoggingComponentActivity() {
             AppTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
                     DeletionConfirmationDialog(
-                        fileName = args.moveFile.mediaStoreData.name,
+                        fileName = args.moveFile.mediaStoreEntry.fileName,
                         onDismissRequest = { finishAndRemoveTask() },
                         onConfirmation = { launchFileDeletion() }
                     )
@@ -78,7 +78,7 @@ internal class FileDeletionActivity : LoggingComponentActivity() {
                     showToast(
                         resources.getHtmlFormattedText(
                             R.string.successfully_deleted,
-                            args.moveFile.mediaStoreData.name
+                            args.moveFile.mediaStoreEntry.fileName
                         )
                     )
                     notificationEventHandler(args.cancelNotificationEvent)
@@ -86,7 +86,7 @@ internal class FileDeletionActivity : LoggingComponentActivity() {
                     showToast(
                         resources.getHtmlFormattedText(
                             R.string.couldn_t_delete,
-                            args.moveFile.mediaStoreData.name
+                            args.moveFile.mediaStoreEntry.fileName
                         )
                     )
                 }

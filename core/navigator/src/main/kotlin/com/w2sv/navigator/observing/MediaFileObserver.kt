@@ -4,7 +4,7 @@ import android.os.Handler
 import com.w2sv.domain.model.filetype.FileAndSourceType
 import com.w2sv.domain.model.filetype.FileType
 import com.w2sv.domain.model.filetype.SourceType
-import com.w2sv.navigator.domain.moving.MediaStoreFileData
+import com.w2sv.navigator.domain.moving.MediaStoreEntry
 
 internal class MediaFileObserver(
     private val fileType: FileType,
@@ -13,14 +13,15 @@ internal class MediaFileObserver(
     environment: FileObserverEnvironment
 ) : FileObserver(
     mediaType = fileType.mediaType,
+    blacklistSize = 16,
     handler = handler,
     environment = environment
 ) {
     override val logIdentifier: String
-        get() = "${super.logIdentifier}.${fileType.logIdentifier}"
+        get() = "${fileType.logIdentifier}FileObserver"
 
-    override fun matchingFileAndSourceTypeOrNull(mediaStoreFileData: MediaStoreFileData): FileAndSourceType? {
-        val sourceType = mediaStoreFileData.sourceType()
+    override fun enabledFileAndSourceTypeOrNull(mediaStoreEntry: MediaStoreEntry): FileAndSourceType? {
+        val sourceType = mediaStoreEntry.sourceType()
 
         return if (enabledSourceTypes.contains(sourceType)) {
             FileAndSourceType(fileType, sourceType)
