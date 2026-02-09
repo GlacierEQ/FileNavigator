@@ -5,8 +5,8 @@ package com.w2sv.navigator.notifications
  */
 internal enum class AppNotification(val channel: AppNotificationChannel) {
     FileNavigatorIsRunning(AppNotificationChannel.FileNavigatorIsRunning),
-    NewNavigatableFile(AppNotificationChannel.NewNavigatableFile),
-    BatchMoveFiles(AppNotificationChannel.NewNavigatableFile),
+    NavigateFile(AppNotificationChannel.NavigateFile),
+    BatchMoveFiles(AppNotificationChannel.NavigateFile),
     AutoMoveDestinationInvalid(AppNotificationChannel.AutoMoveDestinationInvalid),
     BatchMoveProgress(AppNotificationChannel.MoveProgress);
 

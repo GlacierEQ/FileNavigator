@@ -17,7 +17,6 @@ import com.w2sv.common.util.removeSlashSuffix
 import com.w2sv.common.util.slashPrefixed
 import com.w2sv.core.common.R
 import com.w2sv.domain.model.filetype.PresetFileType
-import com.w2sv.domain.model.filetype.SourceType
 import com.w2sv.navigator.domain.NavigatorIntents
 import com.w2sv.navigator.domain.moving.DestinationSelectionManner
 import com.w2sv.navigator.domain.moving.MoveDestination
@@ -40,14 +39,14 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import slimber.log.i
 
-internal class MoveFileNotificationController @Inject constructor(
+internal class NavigateFileNotificationController @Inject constructor(
     environment: NotificationEnvironment,
     private val getQuickMoveDestinations: GetQuickMoveDestinations,
     private val navigatorIntents: NavigatorIntents,
     @ApplicationDefaultScope private val scope: CoroutineScope
-) : MultiNotificationController<MoveFileNotificationController.Args>(
+) : MultiNotificationController<NavigateFileNotificationController.Args>(
     environment = environment,
-    appNotification = AppNotification.NewNavigatableFile,
+    appNotification = AppNotification.NavigateFile,
     configureSummaryNotification = { context, activeNotifications ->
         this
             .setContentTitle(
@@ -219,10 +218,7 @@ internal class MoveFileNotificationController @Inject constructor(
 
 private fun MoveFile.largeNotificationIcon(context: Context): Bitmap? =
     when (fileType.wrappedPresetTypeOrNull) {
-        PresetFileType.Image -> context.contentResolver.loadBitmapWithFileNotFoundHandling(
-            mediaUri.uri
-        )
-
+        PresetFileType.Image -> context.contentResolver.loadBitmapWithFileNotFoundHandling(mediaUri.uri)
         PresetFileType.Video -> {
             try {
                 context.contentResolver.loadThumbnail(
@@ -241,7 +237,7 @@ private fun MoveFile.largeNotificationIcon(context: Context): Bitmap? =
 private fun MoveFile.notificationContentText(context: Context): SpannedString =
     buildSpannedString {
         append(mediaStoreEntry.fileName.lineBreakSuffixed())
-        bold { append(context.getString(R.string.directory).lineBreakSuffixed()) }
+        bold { append(context.getString(R.string.location).lineBreakSuffixed()) }
         append(
             mediaStoreEntry.relativePath
                 .removeSlashSuffix()
@@ -254,33 +250,6 @@ private fun MoveFile.notificationContentText(context: Context): SpannedString =
 
 private fun MoveFile.notificationTitle(context: Context): String =
     context.getString(
-        R.string.new_move_file_notification_title,
-        notificationLabel(context = context)
+        R.string.navigate_file_notification_title,
+        label(context = context)
     )
-
-private fun MoveFile.notificationLabel(context: Context): String =
-    when {
-        isGif -> context.getString(R.string.gif)
-        else -> {
-            when (sourceType) {
-                SourceType.Screenshot, SourceType.Recording -> context.getString(
-                    sourceType.labelRes
-                )
-
-                SourceType.Camera -> context.getString(
-                    when (val wrappedType = fileType.wrappedPresetTypeOrNull) {
-                        PresetFileType.Image -> R.string.photo
-                        PresetFileType.Video -> R.string.video
-                        else -> error("wrapped file type should be PresetFileType.Image or PresetFileType.Video but was $wrappedType")
-                    }
-                )
-
-                SourceType.Download -> context.getString(
-                    R.string.file_type_download,
-                    fileType.label(context)
-                )
-
-                SourceType.OtherApp -> "/${mediaStoreEntry.parentDirName} ${fileType.label(context)}"
-            }
-        }
-    }

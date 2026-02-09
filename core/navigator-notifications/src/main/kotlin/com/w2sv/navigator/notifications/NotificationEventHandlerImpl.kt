@@ -12,7 +12,7 @@ import com.w2sv.navigator.notifications.controller.BatchMoveNotificationArgs
 import com.w2sv.navigator.notifications.controller.BatchMoveNotificationController
 import com.w2sv.navigator.notifications.controller.BatchMoveProgressNotificationController
 import com.w2sv.navigator.notifications.controller.BatchMoveResultsNotificationController
-import com.w2sv.navigator.notifications.controller.MoveFileNotificationController
+import com.w2sv.navigator.notifications.controller.NavigateFileNotificationController
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +26,7 @@ import slimber.log.i
 internal class NotificationEventHandlerImpl @Inject constructor(
     navigatorConfigFlow: NavigatorConfigFlow,
     @ApplicationIoScope scope: CoroutineScope,
-    private val moveFileNotificationController: MoveFileNotificationController,
+    private val navigateFileNotificationController: NavigateFileNotificationController,
     private val batchMoveNotificationController: BatchMoveNotificationController,
     private val batchMoveProgressNotificationController: BatchMoveProgressNotificationController,
     private val batchMoveResultsNotificationController: BatchMoveResultsNotificationController,
@@ -37,12 +37,12 @@ internal class NotificationEventHandlerImpl @Inject constructor(
 
     init {
         // Collect moveFileNotification updates
-        moveFileNotificationController.updates.collectOn(scope) { event ->
+        navigateFileNotificationController.updates.collectOn(scope) { event ->
             batchMoveNotificationArgs.update {
                 it.copy {
                     when (event) {
-                        is MoveFileNotificationController.UpdateEvent.Cancelled -> remove(event.id)
-                        is MoveFileNotificationController.UpdateEvent.Added -> put(event.id, event.args)
+                        is NavigateFileNotificationController.UpdateEvent.Cancelled -> remove(event.id)
+                        is NavigateFileNotificationController.UpdateEvent.Added -> put(event.id, event.args)
                     }
                 }
             }
@@ -92,10 +92,10 @@ internal class NotificationEventHandlerImpl @Inject constructor(
     }
 
     private fun onPostMoveFile(event: NotificationEvent.PostMoveFile) {
-        moveFileNotificationController.post(event.moveFile)
+        navigateFileNotificationController.post(event.moveFile)
     }
 
     private fun onCancelMoveFile(event: NotificationEvent.CancelMoveFile) {
-        moveFileNotificationController.cancel(event.id)
+        navigateFileNotificationController.cancel(event.id)
     }
 }

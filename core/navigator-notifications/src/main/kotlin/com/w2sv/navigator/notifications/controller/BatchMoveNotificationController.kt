@@ -17,7 +17,7 @@ import com.w2sv.navigator.notifications.api.SingleNotificationController
 import com.w2sv.navigator.notifications.helper.drawableBitmap
 import javax.inject.Inject
 
-internal typealias BatchMoveNotificationArgs = Map<Int, MoveFileNotificationController.Args>
+internal typealias BatchMoveNotificationArgs = Map<Int, NavigateFileNotificationController.Args>
 
 internal class BatchMoveNotificationController @Inject constructor(
     environment: NotificationEnvironment,

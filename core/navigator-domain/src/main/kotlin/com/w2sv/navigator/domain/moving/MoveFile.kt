@@ -8,7 +8,6 @@ import com.anggrayudi.storage.media.MediaType
 import com.w2sv.common.uri.MediaUri
 import com.w2sv.domain.model.filetype.FileAndSourceType
 import com.w2sv.domain.model.filetype.FileType
-import com.w2sv.domain.model.filetype.PresetFileType
 import com.w2sv.domain.model.filetype.SourceType
 import kotlinx.parcelize.Parcelize
 
@@ -23,6 +22,9 @@ data class MoveFile(val mediaUri: MediaUri, val mediaStoreEntry: MediaStoreEntry
             id = mediaStoreEntry.rowId
         )
 
+    fun label(context: Context): String =
+        fileAndSourceType.label(context, isGif)
+
     val fileType: FileType
         get() = fileAndSourceType.fileType
 
@@ -33,5 +35,5 @@ data class MoveFile(val mediaUri: MediaUri, val mediaStoreEntry: MediaStoreEntry
         get() = fileType.mediaType
 
     val isGif: Boolean
-        get() = fileType.wrappedPresetTypeOrNull is PresetFileType.Image && mediaStoreEntry.fileExtension.lowercase() == "gif"
+        get() = mediaStoreEntry.fileExtension.lowercase() == "gif"
 }

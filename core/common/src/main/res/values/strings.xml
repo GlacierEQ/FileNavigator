@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">File Navigator</string>
     <!-- File Types -->
-    <string name="image">Image</string>
+    <string name="image">Picture</string>
     <string name="video">Video</string>
     <string name="audio">Audio</string>
     <string name="pdf" translatable="false">PDF</string>
@@ -18,7 +18,6 @@
     <string name="camera">Camera</string>
     <string name="photo">Photo</string>
 
-    <string name="file_type_download">%1$s Download</string>
     <string name="unrecognized_destination">Unrecognized Destination</string>
     <string name="volume_root">VOLUME ROOT</string>
 
@@ -29,8 +28,8 @@
     <string name="start">Start</string>
     <string name="stop">Stop</string>
 
-    <string name="new_move_file_notification_title">New %1$s</string>
-    <string name="new_navigatable_file">New navigatable file</string>
+    <string name="navigate_file_notification_title">Navigate %1$s</string>
+    <string name="navigate_file_notification_channel">Navigate file</string>
     <string name="move_progress">Move progress</string>
     <string name="manage_all_files_permission_missing">Manage all files permission missing</string>
     <string name="internal_error">Internal Error</string>
@@ -47,7 +46,7 @@
     <string name="auto_move_destination_invalid">Auto Move Destination invalid</string>
     <string name="has_been_deleted_and_got_therefore_removed_from">"has been deleted and got therefore removed from"</string>
     <string name="couldnt_move">Couldn\'t move</string>
-    <string name="directory">Directory</string>
+    <string name="location">Location</string>
     <string name="size">Size</string>
     <string name="move_files">Move %1$d files</string>
     <string name="move_progress_notification_title">Moving %1$d files…</string>

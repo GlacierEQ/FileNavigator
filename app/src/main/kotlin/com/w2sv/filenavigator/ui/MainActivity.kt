@@ -31,8 +31,8 @@ import com.w2sv.filenavigator.ui.navigation.rememberNavigator
 import com.w2sv.filenavigator.ui.util.useDarkTheme
 import com.w2sv.navigator.FileNavigator
 import dagger.hilt.android.AndroidEntryPoint
-import slimber.log.i
 import javax.inject.Inject
+import slimber.log.i
 
 @AndroidEntryPoint
 class MainActivity : LoggingComponentActivity() {

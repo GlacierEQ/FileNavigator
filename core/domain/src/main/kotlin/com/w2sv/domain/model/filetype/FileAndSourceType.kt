@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import com.w2sv.core.common.R
+import kotlin.collections.listOf
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -22,28 +23,27 @@ data class FileAndSourceType(val fileType: FileType, val sourceType: SourceType)
     /**
      * @return
      * - Gif -> 'GIF'
-     * - Photo -> 'Photo'
-     * - Screenshot, Recording -> sourceTypeLabel
-     * - Download -> '{fileTypeLabel} Download'
+     * - SourceType.Camera -> 'Photo' or 'Video"
+     * - SourceType in (Screenshot, Recording) -> sourceTypeLabel
      * - else -> fileTypeLabel
      */
     fun label(context: Context, isGif: Boolean): String =
         when {
             isGif -> context.getString(R.string.gif)
-            fileType.wrappedPresetTypeOrNull is PresetFileType.Image && sourceType == SourceType.Camera -> context.getString(
-                R.string.photo
+            sourceType == SourceType.Camera -> context.getString(
+                when (fileType.wrappedPresetTypeOrNull) {
+                    PresetFileType.Image -> R.string.photo
+                    PresetFileType.Video -> R.string.video
+                    else -> error(
+                        "wrapped file type should be PresetFileType.Image or PresetFileType.Video but was ${fileType.wrappedPresetTypeOrNull}"
+                    )
+                }
             )
-            sourceType == SourceType.Screenshot || sourceType == SourceType.Recording -> context.getString(
+
+            sourceType in listOf(SourceType.Screenshot, SourceType.Recording) -> context.getString(
                 sourceType.labelRes
             )
 
-            fileType is CustomFileType -> fileType.name
-
-            sourceType == SourceType.Download -> context.getString(
-                R.string.file_type_download,
-                context.getString((fileType as AnyPresetWrappingFileType).presetFileType.labelRes)
-            )
-
-            else -> context.getString((fileType as AnyPresetWrappingFileType).presetFileType.labelRes)
+            else -> fileType.label(context)
         }
 }
