@@ -84,14 +84,6 @@ internal abstract class FileObserver(val mediaType: MediaType, blacklistSize: In
         withMediaUriAndId(uri, ::onChangeCore)
     }
 
-    /**
-     * Logs and calls super implementation.
-     */
-    final override fun onChange(selfChange: Boolean, uris: Collection<Uri?>, flags: Int) {
-        onChangeLog(uris.toString(), flags)
-        super.onChange(selfChange, uris, flags)
-    }
-
     private fun onChangeCore(mediaUri: MediaUri, mediaId: MediaId) {
         if (blacklist.contains(mediaId)) return discardedLog { "mediaId blacklisted" }
 
