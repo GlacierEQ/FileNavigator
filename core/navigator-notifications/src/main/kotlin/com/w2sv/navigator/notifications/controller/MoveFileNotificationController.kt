@@ -34,13 +34,12 @@ import com.w2sv.navigator.notifications.helper.GetQuickMoveDestinations
 import com.w2sv.navigator.notifications.helper.iconBitmap
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import slimber.log.i
 
-// TODO make stateless, store state in event handler & unsingletonize this class
-@Singleton
 internal class MoveFileNotificationController @Inject constructor(
     environment: NotificationEnvironment,
     private val getQuickMoveDestinations: GetQuickMoveDestinations,
@@ -63,8 +62,13 @@ internal class MoveFileNotificationController @Inject constructor(
 ) {
     data class Args(val moveFile: MoveFile, val quickMoveDestinations: List<MoveDestination.Directory>)
 
-    val idToArgs: Map<Int, Args>
-        field = mutableMapOf<Int, Args>()
+    internal sealed interface UpdateEvent {
+        data class Added(val id: Int, val args: Args) : UpdateEvent
+        data class Cancelled(val id: Int) : UpdateEvent
+    }
+
+    val updates: SharedFlow<UpdateEvent>
+        field = MutableSharedFlow()
 
     fun post(moveFile: MoveFile) {
         scope.launch {
@@ -74,13 +78,13 @@ internal class MoveFileNotificationController @Inject constructor(
                     .log { "Retrieved quickMoveDestination: $it" }
             )
             val id = post(args)
-            idToArgs[id] = args
+            updates.emit(UpdateEvent.Added(id, args))
         }
     }
 
     override fun cancel(id: Int) {
         super.cancel(id)
-        idToArgs.remove(id)
+        scope.launch { updates.emit(UpdateEvent.Cancelled(id)) }
     }
 
     // =====================

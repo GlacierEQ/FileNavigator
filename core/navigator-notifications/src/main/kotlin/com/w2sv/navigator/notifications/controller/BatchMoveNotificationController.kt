@@ -10,19 +10,19 @@ import com.w2sv.navigator.domain.moving.DestinationSelectionManner
 import com.w2sv.navigator.domain.moving.MoveDestination
 import com.w2sv.navigator.domain.moving.MoveFileNotificationData
 import com.w2sv.navigator.domain.moving.MoveOperation
-import com.w2sv.navigator.domain.notifications.CancelNotificationEvent
+import com.w2sv.navigator.domain.notifications.NotificationEvent
 import com.w2sv.navigator.notifications.AppNotification
 import com.w2sv.navigator.notifications.api.NotificationEnvironment
 import com.w2sv.navigator.notifications.api.SingleNotificationController
 import com.w2sv.navigator.notifications.helper.drawableBitmap
 import javax.inject.Inject
 
-internal typealias BatchMoveNotificationControllerArgs = Map<CancelNotificationEvent, MoveFileNotificationController.Args>
+internal typealias BatchMoveNotificationArgs = Map<Int, MoveFileNotificationController.Args>
 
 internal class BatchMoveNotificationController @Inject constructor(
     environment: NotificationEnvironment,
     private val navigatorIntents: NavigatorIntents
-) : SingleNotificationController<BatchMoveNotificationControllerArgs>(
+) : SingleNotificationController<BatchMoveNotificationArgs>(
     environment = environment,
     appNotification = AppNotification.BatchMoveFiles
 ) {
@@ -32,7 +32,7 @@ internal class BatchMoveNotificationController @Inject constructor(
         QuickMoveAction
     }
 
-    override fun NotificationCompat.Builder.configure(args: BatchMoveNotificationControllerArgs, id: Int) {
+    override fun NotificationCompat.Builder.configure(args: BatchMoveNotificationArgs, id: Int) {
         setGroup(channel.id)
         setContentTitle(
             context.getString(
@@ -64,7 +64,7 @@ internal class BatchMoveNotificationController @Inject constructor(
         )
 
     // TODO: refactor
-    private fun NotificationCompat.Builder.addQuickMoveActions(args: BatchMoveNotificationControllerArgs) {
+    private fun NotificationCompat.Builder.addQuickMoveActions(args: BatchMoveNotificationArgs) {
         val occurrenceOrderedQuickMoveDestinations =
             args.values.flatMap { it.quickMoveDestinations }
                 .groupingBy { it }
@@ -101,29 +101,21 @@ internal class BatchMoveNotificationController @Inject constructor(
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
         )
-
-    fun cancelOrUpdate(args: BatchMoveNotificationControllerArgs) {
-        if (args.size <= 1) {
-            cancel()
-        } else {
-            post(args)
-        }
-    }
 }
 
-private fun BatchMoveNotificationControllerArgs.moveFileNotificationData(): List<MoveFileNotificationData> =
-    map { (cancelEvent, args) ->
+private fun BatchMoveNotificationArgs.moveFileNotificationData(): List<MoveFileNotificationData> =
+    map { (id, args) ->
         MoveFileNotificationData(
             moveFile = args.moveFile,
-            cancelNotificationEvent = cancelEvent
+            cancelNotificationEvent = NotificationEvent.CancelMoveFile(id)
         )
     }
 
-private fun BatchMoveNotificationControllerArgs.quickMoveBundles(destination: MoveDestination.Directory): List<MoveOperation.QuickMove> =
-    map { (cancelEvent, args) ->
+private fun BatchMoveNotificationArgs.quickMoveBundles(destination: MoveDestination.Directory): List<MoveOperation.QuickMove> =
+    map { (id, args) ->
         MoveOperation.QuickMove(
             file = args.moveFile,
-            destinationSelectionManner = DestinationSelectionManner.Quick(cancelEvent),
+            destinationSelectionManner = DestinationSelectionManner.Quick(NotificationEvent.CancelMoveFile(id)),
             destination = destination,
             isPartOfBatch = true
         )

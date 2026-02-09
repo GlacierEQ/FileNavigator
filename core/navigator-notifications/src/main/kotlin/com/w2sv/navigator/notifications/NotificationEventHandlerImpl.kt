@@ -1,24 +1,31 @@
 package com.w2sv.navigator.notifications
 
 import com.w2sv.common.di.ApplicationIoScope
+import com.w2sv.common.util.combineToPair
 import com.w2sv.domain.model.navigatorconfig.NavigatorConfigFlow
+import com.w2sv.kotlinutils.copy
+import com.w2sv.kotlinutils.coroutines.flow.collectOn
 import com.w2sv.navigator.domain.notifications.NotificationEvent
 import com.w2sv.navigator.domain.notifications.NotificationEventHandler
 import com.w2sv.navigator.notifications.controller.AutoMoveDestinationInvalidNotificationController
+import com.w2sv.navigator.notifications.controller.BatchMoveNotificationArgs
 import com.w2sv.navigator.notifications.controller.BatchMoveNotificationController
-import com.w2sv.navigator.notifications.controller.BatchMoveNotificationControllerArgs
 import com.w2sv.navigator.notifications.controller.BatchMoveProgressNotificationController
 import com.w2sv.navigator.notifications.controller.BatchMoveResultsNotificationController
 import com.w2sv.navigator.notifications.controller.MoveFileNotificationController
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import slimber.log.i
 
+@Singleton
 internal class NotificationEventHandlerImpl @Inject constructor(
     navigatorConfigFlow: NavigatorConfigFlow,
-    @ApplicationIoScope private val scope: CoroutineScope,
+    @ApplicationIoScope scope: CoroutineScope,
     private val moveFileNotificationController: MoveFileNotificationController,
     private val batchMoveNotificationController: BatchMoveNotificationController,
     private val batchMoveProgressNotificationController: BatchMoveProgressNotificationController,
@@ -26,12 +33,38 @@ internal class NotificationEventHandlerImpl @Inject constructor(
     private val autoMoveDestinationInvalidNotificationController: AutoMoveDestinationInvalidNotificationController
 ) : NotificationEventHandler {
 
-    private val showBatchMoveNotification =
-        navigatorConfigFlow
-            .map { it.showBatchMoveNotification }
-            .stateIn(scope, SharingStarted.Eagerly, false)
+    private val batchMoveNotificationArgs = MutableStateFlow<BatchMoveNotificationArgs>(emptyMap())
+
+    init {
+        // Collect moveFileNotification updates
+        moveFileNotificationController.updates.collectOn(scope) { event ->
+            batchMoveNotificationArgs.update {
+                it.copy {
+                    when (event) {
+                        is MoveFileNotificationController.UpdateEvent.Cancelled -> remove(event.id)
+                        is MoveFileNotificationController.UpdateEvent.Added -> put(event.id, event.args)
+                    }
+                }
+            }
+        }
+
+        // Reactively cancel or post batch move notifications
+        combineToPair(
+            navigatorConfigFlow.map { it.showBatchMoveNotification },
+            batchMoveNotificationArgs
+        )
+            .distinctUntilChanged()
+            .collectOn(scope) { (showBatchMoveNotification, idToArgs) ->
+                when {
+                    !showBatchMoveNotification || idToArgs.size <= 1 -> batchMoveNotificationController.cancel()
+                    else -> batchMoveNotificationController.post(args = idToArgs)
+                }
+            }
+    }
 
     override operator fun invoke(event: NotificationEvent) {
+        i { "Received notification event $event" }
+
         when (event) {
             is NotificationEvent.PostMoveFile -> onPostMoveFile(event)
             is NotificationEvent.CancelMoveFile -> onCancelMoveFile(event)
@@ -60,19 +93,9 @@ internal class NotificationEventHandlerImpl @Inject constructor(
 
     private fun onPostMoveFile(event: NotificationEvent.PostMoveFile) {
         moveFileNotificationController.post(event.moveFile)
-        if (showBatchMoveNotification.value && moveFileNotificationController.notificationCount > 1) {
-            batchMoveNotificationController.post(batchMoveNotificationArgs())
-        }
     }
 
     private fun onCancelMoveFile(event: NotificationEvent.CancelMoveFile) {
         moveFileNotificationController.cancel(event.id)
-        // TODO: track whether single instance notification is showing or not
-        if (showBatchMoveNotification.value) {
-            batchMoveNotificationController.cancelOrUpdate(batchMoveNotificationArgs())
-        }
     }
-
-    private fun batchMoveNotificationArgs(): BatchMoveNotificationControllerArgs =
-        moveFileNotificationController.idToArgs.mapKeys { (id, _) -> NotificationEvent.CancelMoveFile(id) }
 }
