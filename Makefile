@@ -24,6 +24,8 @@ generate-proto:
 generate-module-graph:
 	@./gradlew generateModulesGraphvizText --no-configure-on-demand -Pmodules.graph.output.gv=all_modules
 	@dot -Tsvg all_modules -o module-graph.svg
+	@mv module-graph.svg docs/
+	@rm all_modules
 
 take-screenshot:
 	@adb shell screencap -p /sdcard/Pictures/screenshot1.png

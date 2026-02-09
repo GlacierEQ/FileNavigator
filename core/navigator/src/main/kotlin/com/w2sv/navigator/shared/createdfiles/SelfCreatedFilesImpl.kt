@@ -1,4 +1,4 @@
-package com.w2sv.navigator.shared.created_files
+package com.w2sv.navigator.shared.createdfiles
 
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -5,7 +5,7 @@ import com.w2sv.common.di.ApplicationIoScope
 import com.w2sv.domain.model.navigatorconfig.NavigatorConfigFlow
 import com.w2sv.navigator.domain.notifications.NotificationEventHandler
 import com.w2sv.navigator.moving.FileMover
-import com.w2sv.navigator.shared.created_files.SelfCreatedFiles
+import com.w2sv.navigator.shared.createdfiles.SelfCreatedFiles
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope

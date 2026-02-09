@@ -102,6 +102,7 @@ dependencies {
     implementation(projects.core.datastore)
     implementation(projects.core.domain)
     implementation(projects.core.navigator)
+    implementation(projects.core.navigatorQuicktile)
 
     implementation(libs.w2sv.androidutils.core)
     implementation(libs.w2sv.kotlinutils)

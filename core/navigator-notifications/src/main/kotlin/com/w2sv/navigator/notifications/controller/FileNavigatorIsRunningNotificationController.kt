@@ -25,7 +25,7 @@ internal class FileNavigatorIsRunningNotificationController @Inject constructor(
 
         foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
 
-        setContentIntent(navigatorIntents.openMainActivity())
+        setContentIntent(navigatorIntents.openMainActivityPending())
         addAction(stopNavigatorAction())
     }
 

@@ -6,8 +6,7 @@ import android.service.quicksettings.Tile
 import androidx.annotation.IntDef
 import com.w2sv.navigator.FileNavigator
 import com.w2sv.navigator.di.FileNavigatorIsRunning
-import com.w2sv.navigator.shared.mainActivityIntent
-import com.w2sv.navigator.shared.mainActivityPendingIntent
+import com.w2sv.navigator.domain.NavigatorIntents
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +19,9 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FileNavigatorTileService : LoggingTileService() {
+
+    @Inject
+    internal lateinit var navigatorIntents: NavigatorIntents
 
     @Inject
     @FileNavigatorIsRunning
@@ -47,7 +49,7 @@ class FileNavigatorTileService : LoggingTileService() {
         super.onClick()
 
         when (qsTile.state) {
-            Tile.STATE_ACTIVE -> FileNavigator.stop(this)
+            Tile.STATE_ACTIVE -> navigatorIntents.stopNavigator()
             Tile.STATE_INACTIVE -> activateNavigator()
         }
     }
@@ -60,7 +62,7 @@ class FileNavigatorTileService : LoggingTileService() {
      */
     private fun activateNavigator() {
         when (FileNavigator.necessaryPermissionsGranted(this)) {
-            true -> FileNavigator.start(this@FileNavigatorTileService)
+            true -> navigatorIntents.startNavigator()
             false -> startMainActivityAndCollapse()
         }
     }
@@ -68,10 +70,10 @@ class FileNavigatorTileService : LoggingTileService() {
     @SuppressLint("StartActivityAndCollapseDeprecated")
     private fun startMainActivityAndCollapse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            startActivityAndCollapse(mainActivityPendingIntent(this))
+            startActivityAndCollapse(navigatorIntents.openMainActivityPending())
         } else {
             @Suppress("DEPRECATION")
-            startActivityAndCollapse(mainActivityIntent(this))
+            startActivityAndCollapse(navigatorIntents.openMainActivity())
         }
     }
 

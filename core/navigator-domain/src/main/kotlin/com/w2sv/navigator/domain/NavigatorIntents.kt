@@ -36,9 +36,12 @@ interface NavigatorIntents {
     // Navigation / app control
     // =====================
 
+    fun startNavigator()
     fun stopNavigator(): Intent
 
-    fun openMainActivity(): PendingIntent
+    fun openMainActivity(): Intent
+
+    fun openMainActivityPending(): PendingIntent
 
     // =====================
     // Batch move (broadcast)

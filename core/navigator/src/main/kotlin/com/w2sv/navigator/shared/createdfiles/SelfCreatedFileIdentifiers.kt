@@ -1,4 +1,4 @@
-package com.w2sv.navigator.shared.created_files
+package com.w2sv.navigator.shared.createdfiles
 
 import com.anggrayudi.storage.media.MediaType
 import com.w2sv.common.uri.MediaId

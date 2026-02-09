@@ -18,8 +18,8 @@ import com.w2sv.navigator.domain.moving.MoveFile
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.notifications.CancelNotificationEvent
 import com.w2sv.navigator.moving.MoveBroadcastReceiver
-import com.w2sv.navigator.shared.created_files.EmitSelfCreatedFile
-import com.w2sv.navigator.shared.created_files.SelfCreatedFileIdentifiers
+import com.w2sv.navigator.shared.createdfiles.EmitSelfCreatedFile
+import com.w2sv.navigator.shared.createdfiles.SelfCreatedFileIdentifiers
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
