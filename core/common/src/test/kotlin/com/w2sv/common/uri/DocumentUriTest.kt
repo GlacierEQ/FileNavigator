@@ -1,8 +1,7 @@
-package com.w2sv.common.util
+package com.w2sv.common.uri
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.w2sv.common.uri.DocumentUri
 import com.w2sv.test.testParceling
 import org.junit.Assert.assertEquals
 import org.junit.Test

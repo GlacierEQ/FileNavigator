@@ -1,7 +1,5 @@
-package com.w2sv.common.util
+package com.w2sv.common.uri
 
-import com.w2sv.common.uri.MediaId
-import com.w2sv.common.uri.MediaUri
 import com.w2sv.test.testParceling
 import junit.framework.TestCase.assertEquals
 import org.junit.Test

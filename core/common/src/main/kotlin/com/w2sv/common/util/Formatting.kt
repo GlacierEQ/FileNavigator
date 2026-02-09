@@ -15,19 +15,30 @@ fun String.lineBreakSuffixed(): String =
 fun String.colonSuffixed(): String =
     "$this:"
 
-fun formattedFileSize(bytes: Long, locale: Locale = Locale.getDefault()): String {
-    if (bytes in -999..999) {
-        return "$bytes B"
+/**
+ * Formats a byte count (as returned by [java.io.File.length]) into a human-readable file size.
+ *
+ * Uses decimal (1000-based) units (kB, MB, GB, …), rounds to at most two fractional
+ * digits, and applies locale-specific number formatting.
+ */
+fun formattedFileSize(byteCount: Long, locale: Locale = Locale.getDefault()): String {
+    if (byteCount < 1000) {
+        return "$byteCount B"
     }
-    val dimensionPrefixIterator = "kMGTPE".iterator()
-    var dimensionPrefix = dimensionPrefixIterator.next()
-    var byteCount = bytes.toDouble()
-    while (byteCount <= -999_950 || byteCount >= 999_950) {
-        byteCount /= 1000
-        dimensionPrefix = dimensionPrefixIterator.next()
+
+    val units = arrayOf("kB", "MB", "GB", "TB", "PB", "EB")
+    var value = byteCount.toDouble()
+    var unitIndex = -1
+
+    while (value >= 999.5 && unitIndex < units.lastIndex) {
+        value /= 1000.0
+        unitIndex++
     }
-    val numberFormat = NumberFormat.getNumberInstance(locale).apply {
-        maximumFractionDigits = 3
+
+    val format = NumberFormat.getNumberInstance(locale).apply {
+        maximumFractionDigits = 2
+        minimumFractionDigits = 0
     }
-    return "${numberFormat.format(byteCount / 1000)} ${dimensionPrefix}B"
+
+    return "${format.format(value)} ${units[unitIndex]}"
 }
