@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.w2sv.common.logging.logIdentifier
 import slimber.log.i
 
-abstract class LifecycleLoggingViewModel : ViewModel() {
+abstract class LoggingViewModel : ViewModel() {
 
     init {
         i { "Lifecycle: ${this.logIdentifier}.init" }

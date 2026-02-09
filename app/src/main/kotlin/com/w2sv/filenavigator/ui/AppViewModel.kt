@@ -10,7 +10,7 @@ import com.w2sv.domain.repository.PreferencesRepository
 import com.w2sv.filenavigator.ui.navigation.Screen
 import com.w2sv.filenavigator.ui.sharedstate.AppPermissionsState
 import com.w2sv.filenavigator.ui.sharedstate.ThemeSettings
-import com.w2sv.filenavigator.ui.util.LifecycleLoggingViewModel
+import com.w2sv.filenavigator.ui.util.LoggingViewModel
 import com.w2sv.kotlinutils.coroutines.flow.collectOn
 import com.w2sv.kotlinutils.coroutines.flow.combineStates
 import com.w2sv.kotlinutils.coroutines.flow.mapState
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AppViewModel @Inject constructor(private val preferencesRepository: PreferencesRepository, @ApplicationContext context: Context) :
-    LifecycleLoggingViewModel() {
+    LoggingViewModel() {
 
     private val postNotificationsPermissionRequested by threadUnsafeLazy {
         preferencesRepository.postNotificationsPermissionRequested.stateIn(

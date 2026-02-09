@@ -3,7 +3,7 @@ package com.w2sv.filenavigator.ui.screen.navigatorsettings
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.w2sv.domain.repository.NavigatorConfigDataSource
-import com.w2sv.filenavigator.ui.util.LifecycleLoggingViewModel
+import com.w2sv.filenavigator.ui.util.LoggingViewModel
 import com.w2sv.kotlinutils.coroutines.flow.collectOn
 import com.w2sv.navigator.FileNavigator
 import com.w2sv.navigator.di.FileNavigatorIsRunning
@@ -24,7 +24,7 @@ class NavigatorSettingsScreenViewModel @Inject constructor(
     navigatorConfigDataSource: NavigatorConfigDataSource,
     @FileNavigatorIsRunning val navigatorIsRunning: StateFlow<Boolean>,
     @ApplicationContext context: Context
-) : LifecycleLoggingViewModel() {
+) : LoggingViewModel() {
 
     init {
         // Launch registering/unregistering of PowerSaveModeChangedReceiver on change of navigatorConfig.disableOnLowBattery

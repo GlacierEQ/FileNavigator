@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.w2sv.domain.model.MovedFile
 import com.w2sv.domain.repository.MovedFileRepository
 import com.w2sv.domain.usecase.GetMoveHistoryUseCase
-import com.w2sv.filenavigator.ui.util.LifecycleLoggingViewModel
+import com.w2sv.filenavigator.ui.util.LoggingViewModel
 import com.w2sv.navigator.di.FileNavigatorIsRunning
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -20,7 +20,7 @@ class HomeScreenViewModel @Inject constructor(
     private val movedFileRepository: MovedFileRepository,
     getMoveHistoryUseCase: GetMoveHistoryUseCase,
     @FileNavigatorIsRunning val navigatorIsRunning: StateFlow<Boolean>
-) : LifecycleLoggingViewModel() {
+) : LoggingViewModel() {
 
     val moveHistory = getMoveHistoryUseCase
         .invoke()

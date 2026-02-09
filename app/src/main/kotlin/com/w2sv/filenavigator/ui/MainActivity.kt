@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnticipateInterpolator
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,8 +17,11 @@ import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.splashscreen.SplashScreenViewProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.w2sv.common.logging.LoggingComponentActivity
 import com.w2sv.common.logging.log
+import com.w2sv.common.logging.logIdentifier
 import com.w2sv.composed.core.CollectFromFlow
+import com.w2sv.composed.core.OnChange
 import com.w2sv.designsystem.theme.AppTheme
 import com.w2sv.domain.usecase.MoveDestinationPathConverter
 import com.w2sv.filenavigator.BuildConfig
@@ -29,10 +31,11 @@ import com.w2sv.filenavigator.ui.navigation.rememberNavigator
 import com.w2sv.filenavigator.ui.util.useDarkTheme
 import com.w2sv.navigator.FileNavigator
 import dagger.hilt.android.AndroidEntryPoint
+import slimber.log.i
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : LoggingComponentActivity() {
 
     @Inject
     lateinit var moveDestinationPathConverter: MoveDestinationPathConverter
@@ -52,6 +55,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(useDarkTheme) { enableEdgeToEdge(useDarkTheme = useDarkTheme) }
 
             val navigator = rememberNavigator(startScreen = appVM.startScreen)
+            OnChange(navigator.backStack) { backstack -> i { "BackStack=${backstack.map { it.logIdentifier }}" } }
 
             // Navigate to permissions screen if not all permissions granted and we're not already there
             CollectFromFlow(appVM.permissionsState.allGranted) { allPermissionsGranted ->
