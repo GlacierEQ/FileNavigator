@@ -34,19 +34,16 @@ internal class BatchMoveNotificationController @Inject constructor(
 
     override fun NotificationCompat.Builder.configure(args: BatchMoveNotificationArgs, id: Int) {
         setGroup(channel.id)
-        setContentTitle(
-            context.getString(
-                R.string.move_files,
-                args.size
-            )
-        )
+        setSortKey("0") // Make notification appear first in the group
+        setSilent(true) // Notification will be posted in addition to each 'navigate file' notification; we don't want a double alert
+
+        setContentTitle(context.getString(R.string.move_files, args.size))
         setLargeIcon(
             context.drawableBitmap(
                 drawable = R.drawable.ic_files_24,
                 tint = if (context.resources.configuration.isNightModeActiveCompat) null else Color.BLACK
             )
         )
-        setSilent(true)
         addAction(moveFilesAction(args.moveFileNotificationData()))
         addQuickMoveActions(args)
     }
