@@ -1,17 +1,16 @@
-package com.w2sv.navigator.notifications.api
+package com.w2sv.navigator.notifications.api.controller
 
 import android.app.NotificationChannel
 import androidx.core.app.NotificationCompat
 import com.w2sv.core.common.R
 import com.w2sv.navigator.notifications.AppNotificationChannel
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironment
+import com.w2sv.navigator.notifications.api.notificationBuilder
 
 internal abstract class NotificationController<Args>(
     environment: NotificationEnvironment,
     protected val appNotificationChannel: AppNotificationChannel
-) {
-    protected val context = environment.context
-    protected val notificationManager = environment.notificationManager
-
+) : NotificationEnvironment by environment {
     protected val channel: NotificationChannel = appNotificationChannel.notificationChannel(context)
 
     init {

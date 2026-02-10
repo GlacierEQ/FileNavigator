@@ -5,8 +5,8 @@ import androidx.core.app.NotificationCompat
 import com.w2sv.core.common.R
 import com.w2sv.navigator.domain.NavigatorIntents
 import com.w2sv.navigator.notifications.AppNotification
-import com.w2sv.navigator.notifications.api.NotificationEnvironment
-import com.w2sv.navigator.notifications.api.SingleNotificationController
+import com.w2sv.navigator.notifications.api.controller.SingleNotificationController
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironment
 import com.w2sv.navigator.notifications.api.setBigTextStyle
 import javax.inject.Inject
 

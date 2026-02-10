@@ -8,8 +8,8 @@ import com.w2sv.domain.usecase.MoveDestinationPathConverter
 import com.w2sv.navigator.domain.notifications.NotificationEvent
 import com.w2sv.navigator.notifications.AppNotification
 import com.w2sv.navigator.notifications.NotificationEventReceiver
-import com.w2sv.navigator.notifications.api.MultiNotificationController
-import com.w2sv.navigator.notifications.api.NotificationEnvironment
+import com.w2sv.navigator.notifications.api.controller.MultiNotificationController
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironment
 import com.w2sv.navigator.notifications.helper.iconBitmap
 import javax.inject.Inject
 

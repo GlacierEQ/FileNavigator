@@ -6,8 +6,8 @@ import com.w2sv.core.common.R
 import com.w2sv.navigator.domain.NavigatorIntents
 import com.w2sv.navigator.domain.notifications.NotificationEvent
 import com.w2sv.navigator.notifications.AppNotification
-import com.w2sv.navigator.notifications.api.NotificationEnvironment
-import com.w2sv.navigator.notifications.api.SingleNotificationController
+import com.w2sv.navigator.notifications.api.controller.SingleNotificationController
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironment
 import javax.inject.Inject
 
 internal class BatchMoveProgressNotificationController @Inject constructor(

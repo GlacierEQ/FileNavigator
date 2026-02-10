@@ -1,24 +1,24 @@
-package com.w2sv.navigator.notifications.api
+package com.w2sv.navigator.notifications.api.controller
 
 import android.app.Notification
-import android.content.Context
 import androidx.core.app.NotificationCompat
 import com.w2sv.navigator.notifications.AppNotification
+import com.w2sv.navigator.notifications.api.MultiNotificationIds
+import com.w2sv.navigator.notifications.api.SummaryNotification
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironment
 
 internal abstract class MultiNotificationController<Args>(
     environment: NotificationEnvironment,
     appNotification: AppNotification,
-    configureSummaryNotification: (NotificationCompat.Builder.(Context, Int) -> NotificationCompat.Builder)? = null
+    summaryNotification: SummaryNotification? = null
 ) : NotificationController<Args>(environment, appNotification.channel) {
 
     private val ids = MultiNotificationIds(appNotification.multiInstanceIdBase)
-    private val summaryController: NotificationSummaryController? = configureSummaryNotification?.let {
+    private val summaryController: NotificationSummaryController? = summaryNotification?.let { summary ->
         NotificationSummaryController(
-            context = environment.context,
-            notificationManager = environment.notificationManager,
-            appNotification = appNotification,
-            builder = ::builder,
-            configure = it
+            environment = environment,
+            notificationId = appNotification.summaryId,
+            builder = { count -> summary.run { builder().configure(context, count) } }
         )
     }
 
@@ -26,16 +26,15 @@ internal abstract class MultiNotificationController<Args>(
 
     fun post(args: Args): Int {
         val id = ids.next()
-        val notification = build(args, id)
-        notificationManager.notify(id, notification)
-        summaryController?.onPost(notificationCount)
+        notificationManager.notify(id, build(args, id))
+        summaryController?.update(notificationCount, true)
         return id
     }
 
     open fun cancel(id: Int) {
         notificationManager.cancel(id)
         ids.cancel(id)
-        summaryController?.onCancel(notificationCount)
+        summaryController?.update(notificationCount, false)
     }
 
     fun build(args: Args, id: Int): Notification =
@@ -43,6 +42,6 @@ internal abstract class MultiNotificationController<Args>(
             .apply { configure(args, id) }
             .build()
 
-    override fun builder(): NotificationCompat.Builder =
+    final override fun builder(): NotificationCompat.Builder =
         super.builder().setGroup(appNotificationChannel.name)
 }

@@ -12,8 +12,8 @@ import com.w2sv.navigator.domain.moving.MoveFileNotificationData
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.notifications.NotificationEvent
 import com.w2sv.navigator.notifications.AppNotification
-import com.w2sv.navigator.notifications.api.NotificationEnvironment
-import com.w2sv.navigator.notifications.api.SingleNotificationController
+import com.w2sv.navigator.notifications.api.controller.SingleNotificationController
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironment
 import com.w2sv.navigator.notifications.helper.drawableBitmap
 import javax.inject.Inject
 

@@ -3,7 +3,8 @@ package com.w2sv.navigator.notifications.di
 import android.app.NotificationManager
 import android.content.Context
 import com.w2sv.androidutils.service.systemService
-import com.w2sv.navigator.notifications.api.NotificationEnvironment
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironment
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironmentImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,5 +24,5 @@ internal object NotificationModule {
     @Singleton
     @Provides
     fun notificationEnvironment(@ApplicationContext context: Context, notificationManager: NotificationManager): NotificationEnvironment =
-        NotificationEnvironment(context, notificationManager)
+        NotificationEnvironmentImpl(context, notificationManager)
 }

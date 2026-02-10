@@ -1,7 +1,8 @@
-package com.w2sv.navigator.notifications.api
+package com.w2sv.navigator.notifications.api.controller
 
 import android.app.Notification
 import com.w2sv.navigator.notifications.AppNotification
+import com.w2sv.navigator.notifications.api.env.NotificationEnvironment
 
 internal abstract class SingleNotificationController<Args>(environment: NotificationEnvironment, appNotification: AppNotification) :
     NotificationController<Args>(environment, appNotification.channel) {
