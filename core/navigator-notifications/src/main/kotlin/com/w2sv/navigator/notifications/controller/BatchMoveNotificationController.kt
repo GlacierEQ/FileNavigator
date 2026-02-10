@@ -91,7 +91,7 @@ internal class BatchMoveNotificationController @Inject constructor(
         NotificationCompat.Action(
             R.drawable.ic_app_logo_24,
             context.getString(R.string.to, destinationDirectoryName),
-            PendingIntent.getBroadcast(
+            PendingIntent.getService(
                 context,
                 requestCode,
                 navigatorIntents.startBatchMove(batchMoveBundles),
