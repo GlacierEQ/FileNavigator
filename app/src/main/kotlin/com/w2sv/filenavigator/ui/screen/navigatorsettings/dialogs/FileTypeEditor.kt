@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.w2sv.common.util.containsSpecialCharacter
 import com.w2sv.composed.core.OnChange
 import com.w2sv.composed.core.rememberStyledTextResource
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.domain.model.filetype.AnyPresetWrappingFileType
 import com.w2sv.domain.model.filetype.CustomFileType
 import com.w2sv.domain.model.filetype.FileType

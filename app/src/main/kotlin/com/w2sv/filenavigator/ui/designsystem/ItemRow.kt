@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.designsystem.CharSequenceText
 import com.w2sv.designsystem.theme.AppTheme
 import com.w2sv.designsystem.theme.onSurfaceVariantDecreasedAlpha

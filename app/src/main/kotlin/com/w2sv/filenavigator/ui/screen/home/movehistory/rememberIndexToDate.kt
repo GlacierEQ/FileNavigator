@@ -5,7 +5,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.domain.model.MovedFile
 import java.time.LocalDate
 import java.time.ZoneId

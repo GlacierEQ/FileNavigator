@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 
 @Composable
 fun NavigationDrawerScreenTopAppBar(title: String, modifier: Modifier = Modifier, onNavigationIconClick: () -> Unit) {

@@ -1,0 +1,23 @@
+plugins {
+    alias(libs.plugins.filenavigator.library)
+    alias(libs.plugins.kotlin.parcelize)
+}
+
+dependencies {
+    implementation(projects.modules.domain)
+    implementation(projects.modules.common)
+
+    implementation(libs.androidx.core.ktx)
+
+    implementation(libs.w2sv.androidutils.core)
+    implementation(libs.w2sv.kotlinutils)
+    implementation(libs.slimber)
+
+    implementation(libs.w2sv.simplestorage)
+
+    // ==============
+    // Test
+    // ==============
+
+    testImplementation(projects.modules.test)
+}

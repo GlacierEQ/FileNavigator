@@ -103,13 +103,13 @@ play {
 
 dependencies {
     baselineProfile(projects.benchmarking)
-    implementation(projects.core.common)
-    implementation(projects.core.designsystem)
-    implementation(projects.core.database)
-    implementation(projects.core.datastore)
-    implementation(projects.core.domain)
-    implementation(projects.core.navigator)
-    implementation(projects.core.navigatorQuicktile)
+    implementation(projects.modules.common)
+    implementation(projects.modules.designsystem)
+    implementation(projects.modules.database)
+    implementation(projects.modules.datastore)
+    implementation(projects.modules.domain)
+    implementation(projects.modules.navigator)
+    implementation(projects.modules.navigatorQuicktile)
 
     implementation(libs.w2sv.androidutils.core)
     implementation(libs.w2sv.kotlinutils)

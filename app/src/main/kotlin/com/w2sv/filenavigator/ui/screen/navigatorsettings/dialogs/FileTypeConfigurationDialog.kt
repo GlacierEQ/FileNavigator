@@ -49,7 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.w2sv.common.util.colonSuffixed
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.designsystem.CharSequenceText
 import com.w2sv.designsystem.DialogButton
 import com.w2sv.designsystem.HighlightedDialogButton

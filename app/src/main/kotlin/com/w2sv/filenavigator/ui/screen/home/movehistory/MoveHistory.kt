@@ -42,7 +42,7 @@ import androidx.lifecycle.Lifecycle
 import com.w2sv.common.uri.DocumentUri
 import com.w2sv.composed.core.OnLifecycleEvent
 import com.w2sv.composed.core.extensions.thenIf
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.designsystem.theme.AppTheme
 import com.w2sv.domain.model.MovedFile
 import com.w2sv.domain.model.filetype.PresetFileType

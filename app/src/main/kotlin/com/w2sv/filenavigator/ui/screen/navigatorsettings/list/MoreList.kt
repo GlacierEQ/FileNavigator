@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.domain.model.navigatorconfig.NavigatorConfig
 import com.w2sv.filenavigator.ui.designsystem.ItemRow
 import com.w2sv.filenavigator.ui.designsystem.ItemRowIcon

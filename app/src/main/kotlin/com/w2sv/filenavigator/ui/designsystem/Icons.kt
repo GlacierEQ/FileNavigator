@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.domain.model.filetype.FileType
 import com.w2sv.filenavigator.ui.modelext.color
 

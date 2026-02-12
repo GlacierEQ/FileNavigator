@@ -33,7 +33,7 @@ import com.w2sv.androidutils.content.packagePlayStoreUrl
 import com.w2sv.androidutils.content.startActivity
 import com.w2sv.androidutils.widget.showToast
 import com.w2sv.common.AppUrl
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.designsystem.theme.onSurfaceVariantDecreasedAlpha
 import com.w2sv.filenavigator.ui.LocalNavigator
 import com.w2sv.filenavigator.ui.designsystem.IconSize

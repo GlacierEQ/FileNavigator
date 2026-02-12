@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.designsystem.Easing
 import com.w2sv.designsystem.theme.DEFAULT_ANIMATION_DURATION
 import com.w2sv.designsystem.theme.ResultColor

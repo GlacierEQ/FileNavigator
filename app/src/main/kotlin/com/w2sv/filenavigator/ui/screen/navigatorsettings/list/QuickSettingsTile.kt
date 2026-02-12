@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.w2sv.androidutils.content.componentName
 import com.w2sv.androidutils.service.systemService
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.filenavigator.ui.designsystem.AppSnackbarVisuals
 import com.w2sv.filenavigator.ui.designsystem.SnackbarKind
 import com.w2sv.filenavigator.ui.util.snackbar.ScopedSnackbarController

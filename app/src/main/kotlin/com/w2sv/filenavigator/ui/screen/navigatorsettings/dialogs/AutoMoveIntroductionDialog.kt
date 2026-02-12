@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.w2sv.composed.core.rememberStyledTextResource
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.designsystem.DialogButton
 import com.w2sv.designsystem.theme.AppTheme
 import com.w2sv.filenavigator.ui.AppViewModel

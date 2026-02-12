@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.w2sv.composed.core.isPortraitModeActive
 import com.w2sv.composed.material3.extensions.rememberVisibilityProgress
-import com.w2sv.core.common.R
+import com.w2sv.modules.common.R
 import com.w2sv.filenavigator.ui.designsystem.AppSnackbarHost
 import com.w2sv.filenavigator.ui.designsystem.NavigationDrawerScreenTopAppBar
 import com.w2sv.filenavigator.ui.designsystem.PaddingDefaults
