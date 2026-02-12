@@ -6,6 +6,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.plugins.ExtensionContainer
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
@@ -13,17 +14,17 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 internal fun Project.applyBaseConfig(excludeMetaInfResources: Boolean = true, namespace: Namespace = Namespace.Auto) {
     pluginManager.applyPlugins("ktlint", catalog = catalog)
 
-    extensions.configureKotlinAndroid()
+    extensions.configureKotlinAndroidProject()
     extensions.configureCommon(
         namespace = namespace.get(path),
         catalog = catalog,
         excludeMetaInfResources = excludeMetaInfResources
     )
-
+    enableTestParallelization()
     setRobolectricSdk(this)
 }
 
-private fun ExtensionContainer.configureKotlinAndroid() {
+private fun ExtensionContainer.configureKotlinAndroidProject() {
     configure<KotlinAndroidProjectExtension> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
@@ -68,5 +69,14 @@ private fun ExtensionContainer.configureCommon(
         if (excludeMetaInfResources) {
             packaging.resources.excludes.add("/META-INF/*")
         }
+    }
+}
+
+/**
+ * https://docs.gradle.org/current/userguide/performance.html#a_run_tests_in_parallel
+ */
+private fun Project.enableTestParallelization() {
+    tasks.withType(Test::class.java).configureEach {
+        maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
     }
 }
