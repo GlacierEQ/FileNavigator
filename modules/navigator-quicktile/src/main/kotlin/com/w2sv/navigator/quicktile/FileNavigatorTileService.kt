@@ -89,6 +89,7 @@ class FileNavigatorTileService : LoggingTileService() {
 }
 
 @IntDef(Tile.STATE_ACTIVE, Tile.STATE_INACTIVE, Tile.STATE_UNAVAILABLE)
+@Retention(AnnotationRetention.SOURCE)
 private annotation class TileState
 
 private fun Tile.updateState(@TileState state: Int) {

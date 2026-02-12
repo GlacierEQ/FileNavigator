@@ -80,6 +80,12 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        optIn.add("com.google.accompanist.permissions.ExperimentalPermissionsApi")
+    }
+}
+
 androidComponents {
     onVariants(selector().withBuildType("release")) {
         it.packaging.resources.excludes.add("META-INF/**")
