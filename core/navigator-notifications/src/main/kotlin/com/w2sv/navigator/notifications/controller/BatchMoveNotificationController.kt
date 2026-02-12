@@ -2,6 +2,7 @@ package com.w2sv.navigator.notifications.controller
 
 import android.app.PendingIntent
 import android.graphics.Color
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationCompat
 import com.w2sv.androidutils.res.isNightModeActiveCompat
 import com.w2sv.core.common.R
@@ -45,7 +46,7 @@ internal class BatchMoveNotificationController @Inject constructor(
             )
         )
         addAction(moveFilesAction(args.moveFileNotificationData()))
-        addQuickMoveActions(args)
+        quickMoveActions(args).forEach(::addAction)
     }
 
     private fun moveFilesAction(moveFileNotificationData: List<MoveFileNotificationData>) =
@@ -60,32 +61,24 @@ internal class BatchMoveNotificationController @Inject constructor(
             )
         )
 
-    // TODO: refactor
-    private fun NotificationCompat.Builder.addQuickMoveActions(args: BatchMoveNotificationArgs) {
-        val occurrenceOrderedQuickMoveDestinations =
-            args.values.flatMap { it.quickMoveDestinations }
-                .groupingBy { it }
-                .eachCount().entries.sortedByDescending { it.value }
-                .map { it.key }
-
-        var addedQuickMoveActions = 0
-        occurrenceOrderedQuickMoveDestinations.forEach { moveDestination ->
-            // Don't add action if folder doesn't exist anymore, which results in getDocumentUriFileName returning null.
-            moveDestination.documentFile(context).name?.let { directoryName ->
-                addAction(
-                    quickMoveAction(
-                        destinationDirectoryName = directoryName,
-                        requestCode = PendingIntentRequestCode.QuickMoveAction.ordinal + addedQuickMoveActions,
-                        batchMoveBundles = args.quickMoveBundles(moveDestination)
+    private fun quickMoveActions(args: BatchMoveNotificationArgs): List<NotificationCompat.Action> =
+        buildList {
+            args.frequencyOrderedQuickMoveDestinations().forEach { moveDestination ->
+                // Don't add action if folder doesn't exist anymore, which results in getDocumentUriFileName returning null.
+                moveDestination.documentFile(context).name?.let { directoryName ->
+                    add(
+                        quickMoveAction(
+                            destinationDirectoryName = directoryName,
+                            requestCode = PendingIntentRequestCode.QuickMoveAction.ordinal + size,
+                            batchMoveBundles = args.quickMoveBundles(moveDestination)
+                        )
                     )
-                )
-                addedQuickMoveActions += 1
-                if (addedQuickMoveActions == 2) {
-                    return
+                }
+                if (size == 2) {
+                    return@forEach
                 }
             }
         }
-    }
 
     private fun quickMoveAction(destinationDirectoryName: String, requestCode: Int, batchMoveBundles: List<MoveOperation.QuickMove>) =
         NotificationCompat.Action(
@@ -99,6 +92,16 @@ internal class BatchMoveNotificationController @Inject constructor(
             )
         )
 }
+
+@VisibleForTesting
+internal fun BatchMoveNotificationArgs.frequencyOrderedQuickMoveDestinations(): List<MoveDestination.Directory> =
+    values
+        .flatMap { it.quickMoveDestinations }
+        .groupingBy { it }
+        .eachCount()
+        .toList()
+        .sortedByDescending { (_, count) -> count }
+        .map { (destination, _) -> destination }
 
 private fun BatchMoveNotificationArgs.moveFileNotificationData(): List<MoveFileNotificationData> =
     map { (id, args) ->

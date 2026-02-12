@@ -15,15 +15,11 @@ android {
 
 // Setup protobuf configuration, generating lite Java and Kotlin classes
 protobuf {
-    protoc {
-        artifact = libs.protobuf.protoc.get().toString()
-    }
+    protoc { artifact = libs.protobuf.protoc.get().toString() }
     generateProtoTasks {
         all().forEach { task ->
             task.builtins {
-                register("java") {
-                    option("lite")
-                }
+                register("java") { option("lite") }
                 id("kotlin") // Enables kotlin DSL
             }
         }
