@@ -1,5 +1,4 @@
 import com.android.build.api.dsl.ApkSigningConfig
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -19,6 +18,22 @@ android {
         versionCode = project.property("versionCode").toString().toInt()
         versionName = version.toString()
     }
+
+    fun releaseSigningConfigOrNull(): ApkSigningConfig? {
+        val keystorePropertiesFile = rootProject.file("keystore.properties")
+        if (keystorePropertiesFile.exists()) {
+            val keystoreProperties = Properties().apply { load(FileInputStream(keystorePropertiesFile)) }
+            return signingConfigs.create("release") {
+                storeFile = rootProject.file("keys.jks")
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
+        }
+        logger.warn("Couldn't create signing config; ${keystorePropertiesFile.path} does not exist")
+        return null
+    }
+
     buildTypes {
         getByName("debug") {
             applicationIdSuffix = ".debug"
@@ -45,32 +60,24 @@ android {
         htmlOutput = project.layout.buildDirectory.file("reports/lint-results-debug.html").get().asFile
     }
     // Name built apks "{versionName}.apk"
-    applicationVariants.all {
-        outputs
-            .forEach { output ->
-                (output as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                    "$versionName.apk"
-            }
-    }
+//    applicationVariants.all {
+//        outputs
+//            .forEach { output ->
+//                (output as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+//                    "$versionName.apk"
+//            }
+//    }
+//    extensions.configure<ApplicationAndroidComponentsExtension> {
+//        onVariants { variant: ApplicationVariant ->
+//            variant.outputs.forEach { output ->
+//                output.outputFileName.set("${output.versionName}.apk")
+//            }
+//        }
+//    }
     dependenciesInfo {
         // Disable dependency metadata when building APKs for fdroid reproducibility
         includeInApk = false
     }
-}
-
-private fun BaseAppModuleExtension.releaseSigningConfigOrNull(): ApkSigningConfig? {
-    val keystorePropertiesFile = rootProject.file("keystore.properties")
-    if (keystorePropertiesFile.exists()) {
-        val keystoreProperties = Properties().apply { load(FileInputStream(keystorePropertiesFile)) }
-        return signingConfigs.create("release") {
-            storeFile = rootProject.file("keys.jks")
-            storePassword = keystoreProperties["storePassword"] as String
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-        }
-    }
-    logger.warn("Couldn't create signing config; ${keystorePropertiesFile.path} does not exist")
-    return null
 }
 
 androidComponents {

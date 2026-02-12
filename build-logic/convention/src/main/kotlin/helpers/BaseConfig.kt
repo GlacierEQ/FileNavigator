@@ -1,6 +1,7 @@
 package helpers
 
-import com.android.build.gradle.BaseExtension
+import com.android.build.api.dsl.ApplicationDefaultConfig
+import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -32,7 +33,7 @@ internal fun Project.applyBaseConfig(excludeMetaInfResources: Boolean = true, na
                 )
             }
         }
-        configure<BaseExtension> {
+        configure<CommonExtension> {
             this.namespace = when (namespace) {
                 is Namespace.Auto -> "com.w2sv." + path
                     .removePrefix(":")
@@ -41,17 +42,19 @@ internal fun Project.applyBaseConfig(excludeMetaInfResources: Boolean = true, na
                 is Namespace.Manual -> namespace.namespace
             }
 
-            defaultConfig {
+            defaultConfig.apply {
                 minSdk = catalog.findVersionInt("minSdk")
-                targetSdk = catalog.findVersionInt("compileSdk")
+                compileSdk = catalog.findVersionInt("compileSdk")
+                if (this is ApplicationDefaultConfig) {
+                    targetSdk = catalog.findVersionInt("compileSdk")
+                }
                 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             }
-            compileOptions {
+            compileOptions.apply {
                 sourceCompatibility = JavaVersion.VERSION_17
                 targetCompatibility = JavaVersion.VERSION_17
             }
-            compileSdkVersion(catalog.findVersionInt("compileSdk"))
-            testOptions {
+            testOptions.apply {
                 unitTests {
                     isReturnDefaultValues = true
                     isIncludeAndroidResources = true
@@ -60,7 +63,7 @@ internal fun Project.applyBaseConfig(excludeMetaInfResources: Boolean = true, na
                 animationsDisabled = true
             }
             if (excludeMetaInfResources) {
-                packagingOptions.resources.excludes.add("/META-INF/*")
+                packaging.resources.excludes.add("/META-INF/*")
             }
         }
     }

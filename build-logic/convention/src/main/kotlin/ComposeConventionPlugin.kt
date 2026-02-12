@@ -1,4 +1,4 @@
-import com.android.build.gradle.BaseExtension
+import com.android.build.api.dsl.CommonExtension
 import helpers.applyPlugins
 import helpers.catalog
 import helpers.library
@@ -6,12 +6,28 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 class ComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.applyPlugins("kotlin-compose-compiler", catalog = catalog)
+
+            extensions.configure<CommonExtension> {
+                buildFeatures.compose = true
+            }
+
+            tasks.withType<KotlinCompile> {
+                compilerOptions {
+                    optIn.addAll(
+                        "com.google.accompanist.permissions.ExperimentalPermissionsApi",
+                        "androidx.compose.material3.ExperimentalMaterial3Api",
+                        "androidx.compose.foundation.ExperimentalFoundationApi",
+                        "androidx.compose.foundation.layout.ExperimentalLayoutApi",
+                    )
+                }
+            }
 
             dependencies {
                 "implementation"(library("androidx.compose.material3"))
@@ -26,20 +42,6 @@ class ComposeConventionPlugin : Plugin<Project> {
                 "lintChecks"(library("compose.lint.checks"))
                 "implementation"(library("w2sv.composed.core"))
                 "implementation"(library("w2sv.composed.material3"))
-            }
-
-            extensions.apply {
-                configure<BaseExtension> {
-                    buildFeatures.compose = true
-                    configure<KotlinAndroidProjectExtension> {
-                        compilerOptions.freeCompilerArgs.addAll(
-                            "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
-                            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-                            "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
-                            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi"
-                        )
-                    }
-                }
             }
         }
     }
