@@ -17,6 +17,7 @@ internal sealed interface Namespace {
 
 internal fun Project.applyBaseConfig(excludeMetaInfResources: Boolean = true, namespace: Namespace = Namespace.Auto) {
     pluginManager.applyPlugins("ktlint", catalog = catalog)
+    setRobolectricSdk(this)
 
     extensions.apply {
         configure<KotlinAndroidProjectExtension> {
