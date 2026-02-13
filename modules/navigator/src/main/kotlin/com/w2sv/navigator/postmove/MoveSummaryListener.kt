@@ -1,4 +1,4 @@
-package com.w2sv.navigator.moving
+package com.w2sv.navigator.postmove
 
 import android.content.Context
 import com.w2sv.androidutils.widget.showToast
