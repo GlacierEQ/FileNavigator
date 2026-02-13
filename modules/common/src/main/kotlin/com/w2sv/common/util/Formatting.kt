@@ -36,7 +36,7 @@ fun formattedFileSize(byteCount: Long, locale: Locale = Locale.getDefault()): St
     }
 
     val format = NumberFormat.getNumberInstance(locale).apply {
-        maximumFractionDigits = 2
+        maximumFractionDigits = if (unitIndex == 0) 0 else 2 // Don't display fraction digits on kB
         minimumFractionDigits = 0
     }
 

@@ -18,9 +18,9 @@ class FormattingKtTest {
 
         // kB
         assert("1 kB", 1_000)
-        assert("1.05 kB", 1_050)
-        assert("1.23 kB", 1_230)
-        assert("9.95 kB", 9_950)
+        assert("1 kB", 1_050)
+        assert("1 kB", 1_230)
+        assert("10 kB", 9_950)
         assert("10 kB", 10_000)
         assert("999 kB", 999_000)
 
