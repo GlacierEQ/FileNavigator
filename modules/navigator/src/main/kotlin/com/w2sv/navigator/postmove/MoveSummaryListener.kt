@@ -30,7 +30,7 @@ internal class MoveSummaryListener @Inject constructor(
     suspend fun onMoveResult(summary: MoveOperationSummary) {
         i { "Received $summary" }
 
-        summary.cancelMoveFileNotificationEvent?.let(notificationEventHandler::invoke)
+        summary.cancelNavigateFileNotificationEvent?.let(notificationEventHandler::invoke)
         summary.makeFeedback(context)?.let { feedback ->
             when (feedback) {
                 is MoveOperationFeedback.Toast -> withContext(Dispatchers.Main) { context.showToast(feedback.text, feedback.duration) }

@@ -16,7 +16,7 @@ internal class FileMover @Inject constructor(
     operator fun invoke(operation: MoveOperation, context: Context) {
         scope.launch {
             operation.file.moveTo(destination = operation.destination, context = context) { result ->
-                moveSummaryChannel.trySend(MoveOperationSummary.Companion(result, operation))
+                moveSummaryChannel.trySend(MoveOperationSummary(result, operation))
             }
         }
     }

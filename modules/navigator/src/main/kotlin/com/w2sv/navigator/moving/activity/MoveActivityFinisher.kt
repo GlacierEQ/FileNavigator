@@ -9,7 +9,7 @@ import javax.inject.Inject
 class MoveActivityFinisher @Inject constructor(private val moveSummaryChannel: MoveSummaryChannel) {
 
     fun finishOnError(activity: Activity, error: MoveResult) {
-        moveSummaryChannel.trySend(MoveOperationSummary(error))
+        moveSummaryChannel.trySend(MoveOperationSummary.EarlyCancellation(error))
         activity.finishAndRemoveTask()
     }
 }
