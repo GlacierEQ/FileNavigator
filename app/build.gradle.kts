@@ -59,21 +59,6 @@ android {
         textReport = false
         htmlOutput = project.layout.buildDirectory.file("reports/lint-results-debug.html").get().asFile
     }
-    // Name built apks "{versionName}.apk"
-//    applicationVariants.all {
-//        outputs
-//            .forEach { output ->
-//                (output as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-//                    "$versionName.apk"
-//            }
-//    }
-//    extensions.configure<ApplicationAndroidComponentsExtension> {
-//        onVariants { variant: ApplicationVariant ->
-//            variant.outputs.forEach { output ->
-//                output.outputFileName.set("${output.versionName}.apk")
-//            }
-//        }
-//    }
     dependenciesInfo {
         // Disable dependency metadata when building APKs for fdroid reproducibility
         includeInApk = false

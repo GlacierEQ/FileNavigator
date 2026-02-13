@@ -42,7 +42,6 @@
     <string name="file_already_at_selected_location">File already at the selected destination</string>
     <string name="not_enough_space_on_destination">Not enough space on destination</string>
     <string name="to">to /%1$s</string>
-    <string name="starting_navigator">Launching File Navigator…</string>
     <string name="auto_move_destination_invalid">Auto Move Destination invalid</string>
     <string name="has_been_deleted_and_got_therefore_removed_from">"has been deleted and got therefore removed from"</string>
     <string name="couldnt_move">Couldn\'t move</string>

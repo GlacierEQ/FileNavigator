@@ -38,7 +38,6 @@
     <string name="file_already_at_selected_location">文件已位于指定位置</string>
     <string name="not_enough_space_on_destination">目标文件夹已无可用空间</string>
     <string name="to">移动至 /%1$s</string>
-    <string name="starting_navigator">正在启动File Navigator…</string>
     <string name="auto_move_destination_invalid">设置的自动移动位置现已无效</string>
     <string name="has_been_deleted_and_got_therefore_removed_from">已被删除并以此已不存在于</string>
     <string name="couldnt_move">无法移动</string>
