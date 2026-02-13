@@ -95,16 +95,18 @@ internal class QuickMoveDestinationAccessPermissionActivity : LoggingComponentAc
                 ShowRationale -> {
                     i { "Showing rationale" }
                     setContent {
-                        GrantRationalDialog(
-                            onDismissRequest = {
-                                lifecycleScope.launch {
-                                    preferencesRepository
-                                        .showQuickMovePermissionQueryExplanation
-                                        .save(true)
+                        AppTheme {
+                            GrantRationalDialog(
+                                onDismissRequest = {
+                                    lifecycleScope.launch {
+                                        preferencesRepository
+                                            .showQuickMovePermissionQueryExplanation
+                                            .save(true)
+                                    }
+                                    launchDestinationPicker()
                                 }
-                                launchDestinationPicker()
-                            }
-                        )
+                            )
+                        }
                     }
                 }
 
