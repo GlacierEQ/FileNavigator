@@ -6,7 +6,7 @@ import android.os.Parcelable
 import com.w2sv.androidutils.content.getParcelableCompat
 import com.w2sv.androidutils.content.intent
 import com.w2sv.common.logging.LoggingUnboundService
-import com.w2sv.navigator.di.MoveSummaryChannel
+import com.w2sv.navigator.postmove.MoveSummaryChannel
 import com.w2sv.navigator.domain.moving.MoveDestination
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.postmove.MoveOperationSummary
