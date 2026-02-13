@@ -49,7 +49,7 @@ class FileNavigatorTileService : LoggingTileService() {
         super.onClick()
 
         when (qsTile.state) {
-            Tile.STATE_ACTIVE -> navigatorIntents.stopNavigator()
+            Tile.STATE_ACTIVE -> FileNavigator.stop(this)
             Tile.STATE_INACTIVE -> activateNavigator()
         }
     }
@@ -62,7 +62,7 @@ class FileNavigatorTileService : LoggingTileService() {
      */
     private fun activateNavigator() {
         when (FileNavigator.necessaryPermissionsGranted(this)) {
-            true -> navigatorIntents.startNavigator()
+            true -> FileNavigator.start(this)
             false -> startMainActivityAndCollapse()
         }
     }

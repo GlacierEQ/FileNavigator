@@ -17,6 +17,7 @@ import com.w2sv.filenavigator.ui.designsystem.SnackbarKind
 import com.w2sv.filenavigator.ui.util.snackbar.ScopedSnackbarController
 import com.w2sv.filenavigator.ui.util.snackbar.rememberScopedSnackbarController
 import com.w2sv.navigator.quicktile.FileNavigatorTileService
+import slimber.log.d
 import slimber.log.e
 
 // TODO: debounce
@@ -53,6 +54,8 @@ fun rememberRequestAddFileNavigatorTile(
                     }
 
                     StatusBarManager.TILE_ADD_REQUEST_ERROR_REQUEST_IN_PROGRESS -> e { "TILE_ADD_REQUEST_ERROR_REQUEST_IN_PROGRESS" }
+
+                    else -> d { "Received result $result" }
                 }
             }
         }
