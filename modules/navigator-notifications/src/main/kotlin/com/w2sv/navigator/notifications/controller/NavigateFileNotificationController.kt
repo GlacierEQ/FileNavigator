@@ -20,7 +20,7 @@ import com.w2sv.domain.model.filetype.PresetFileType
 import com.w2sv.navigator.domain.NavigatorIntents
 import com.w2sv.navigator.domain.moving.DestinationSelectionManner
 import com.w2sv.navigator.domain.moving.MoveDestination
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveFileNotificationData
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.notifications.NotificationEvent
@@ -59,7 +59,7 @@ internal class NavigateFileNotificationController @Inject constructor(
             .setSilent(true)
     }
 ) {
-    data class Args(val moveFile: MoveFile, val quickMoveDestinations: List<MoveDestination.Directory>)
+    data class Args(val navigatableFile: NavigatableFile, val quickMoveDestinations: List<MoveDestination.Directory>)
 
     internal sealed interface UpdateEvent {
         data class Added(val id: Int, val args: Args) : UpdateEvent
@@ -69,11 +69,11 @@ internal class NavigateFileNotificationController @Inject constructor(
     val updates: SharedFlow<UpdateEvent>
         field = MutableSharedFlow()
 
-    fun post(moveFile: MoveFile) {
+    fun post(navigatableFile: NavigatableFile) {
         scope.launch {
             val args = Args(
-                moveFile = moveFile,
-                quickMoveDestinations = getQuickMoveDestinations(moveFile.fileAndSourceType)
+                navigatableFile = navigatableFile,
+                quickMoveDestinations = getQuickMoveDestinations(navigatableFile.fileAndSourceType)
                     .log { "Retrieved quickMoveDestination: $it" }
             )
             val id = post(args)
@@ -91,9 +91,9 @@ internal class NavigateFileNotificationController @Inject constructor(
     // =====================
 
     override fun NotificationCompat.Builder.configure(args: Args, id: Int) {
-        setContentTitle(args.moveFile.notificationTitle(context))
-        setLargeIcon(args.moveFile.largeNotificationIcon(context))
-        setBigTextStyle(args.moveFile.notificationContentText(context))
+        setContentTitle(args.navigatableFile.notificationTitle(context))
+        setLargeIcon(args.navigatableFile.largeNotificationIcon(context))
+        setBigTextStyle(args.navigatableFile.notificationContentText(context))
         setActionsAndIntents(args = args, id = id)
     }
 
@@ -124,7 +124,7 @@ internal class NavigateFileNotificationController @Inject constructor(
                 )
             )
         }
-        val notificationData = MoveFileNotificationData(args.moveFile, cancelEvent(id))
+        val notificationData = MoveFileNotificationData(args.navigatableFile, cancelEvent(id))
         addAction(
             deleteFileAction(
                 requestCode = requestCodeIterator.next(),
@@ -151,8 +151,8 @@ internal class NavigateFileNotificationController @Inject constructor(
     // PendingIntents / Actions
     // =====================
 
-    private fun cancelEvent(id: Int): NotificationEvent.CancelMoveFile =
-        NotificationEvent.CancelMoveFile(id)
+    private fun cancelEvent(id: Int): NotificationEvent.CancelNavigateFile =
+        NotificationEvent.CancelNavigateFile(id)
 
     private fun viewFilePendingIntent(requestCode: Int, data: MoveFileNotificationData): PendingIntent =
         PendingIntent.getActivity(
@@ -170,7 +170,7 @@ internal class NavigateFileNotificationController @Inject constructor(
                 context,
                 requestCode,
                 navigatorIntents.pickFileDestination(
-                    file = args.moveFile,
+                    file = args.navigatableFile,
                     startDestination = args.quickMoveDestinations.firstOrNull()?.documentUri,
                     cancelNotification = cancelEvent(id)
                 ),
@@ -193,7 +193,7 @@ internal class NavigateFileNotificationController @Inject constructor(
                 requestCode,
                 navigatorIntents.quickMoveWithPermissionCheck(
                     MoveOperation.QuickMove(
-                        file = args.moveFile,
+                        file = args.navigatableFile,
                         destination = destination,
                         destinationSelectionManner = DestinationSelectionManner.Quick(cancelEvent(id)),
                         isPartOfBatch = false
@@ -216,7 +216,7 @@ internal class NavigateFileNotificationController @Inject constructor(
         )
 }
 
-private fun MoveFile.largeNotificationIcon(context: Context): Bitmap? =
+private fun NavigatableFile.largeNotificationIcon(context: Context): Bitmap? =
     when (fileType.wrappedPresetTypeOrNull) {
         PresetFileType.Image -> context.contentResolver.loadBitmapWithFileNotFoundHandling(mediaUri.uri)
         PresetFileType.Video -> {
@@ -234,7 +234,7 @@ private fun MoveFile.largeNotificationIcon(context: Context): Bitmap? =
         else -> null
     } ?: fileAndSourceType.iconBitmap(context)
 
-private fun MoveFile.notificationContentText(context: Context): SpannedString =
+private fun NavigatableFile.notificationContentText(context: Context): SpannedString =
     buildSpannedString {
         append(mediaStoreEntry.fileName.lineBreakSuffixed())
         bold { append(context.getString(R.string.location).lineBreakSuffixed()) }
@@ -248,7 +248,7 @@ private fun MoveFile.notificationContentText(context: Context): SpannedString =
         append(formattedFileSize(mediaStoreEntry.size))
     }
 
-private fun MoveFile.notificationTitle(context: Context): String =
+private fun NavigatableFile.notificationTitle(context: Context): String =
     context.getString(
         R.string.navigate_file_notification_title,
         label(context = context)

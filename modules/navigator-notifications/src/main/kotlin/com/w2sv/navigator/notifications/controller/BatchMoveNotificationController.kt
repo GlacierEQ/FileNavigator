@@ -106,16 +106,16 @@ internal fun BatchMoveNotificationArgs.frequencyOrderedQuickMoveDestinations(): 
 private fun BatchMoveNotificationArgs.moveFileNotificationData(): List<MoveFileNotificationData> =
     map { (id, args) ->
         MoveFileNotificationData(
-            moveFile = args.moveFile,
-            cancelNotificationEvent = NotificationEvent.CancelMoveFile(id)
+            navigatableFile = args.navigatableFile,
+            cancelNotificationEvent = NotificationEvent.CancelNavigateFile(id)
         )
     }
 
 private fun BatchMoveNotificationArgs.quickMoveBundles(destination: MoveDestination.Directory): List<MoveOperation.QuickMove> =
     map { (id, args) ->
         MoveOperation.QuickMove(
-            file = args.moveFile,
-            destinationSelectionManner = DestinationSelectionManner.Quick(NotificationEvent.CancelMoveFile(id)),
+            file = args.navigatableFile,
+            destinationSelectionManner = DestinationSelectionManner.Quick(NotificationEvent.CancelNavigateFile(id)),
             destination = destination,
             isPartOfBatch = true
         )

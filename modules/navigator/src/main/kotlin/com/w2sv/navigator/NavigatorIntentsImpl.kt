@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import com.w2sv.common.uri.DocumentUri
 import com.w2sv.navigator.domain.NavigatorIntents
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveFileNotificationData
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.notifications.CancelNotificationEvent
@@ -28,10 +28,10 @@ internal class NavigatorIntentsImpl @Inject constructor(@ApplicationContext priv
     override fun deleteFile(moveFileNotificationData: MoveFileNotificationData): Intent =
         FileDeletionActivity.intent(moveFileNotificationData, context)
 
-    override fun pickFileDestination(file: MoveFile, startDestination: DocumentUri?, cancelNotification: CancelNotificationEvent): Intent =
+    override fun pickFileDestination(file: NavigatableFile, startDestination: DocumentUri?, cancelNotification: CancelNotificationEvent): Intent =
         DestinationPickerActivityApi.makeRestartActivityIntent<FileDestinationPickerActivity>(
             FileDestinationPickerActivity.Args(
-                moveFile = file,
+                navigatableFile = file,
                 startDestination = startDestination,
                 cancelNotification = cancelNotification
             ),

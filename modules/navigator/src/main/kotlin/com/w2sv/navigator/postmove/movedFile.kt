@@ -6,7 +6,7 @@ import com.w2sv.common.uri.DocumentUri
 import com.w2sv.common.uri.MediaUri
 import com.w2sv.domain.model.MovedFile
 import com.w2sv.navigator.domain.moving.MoveDestination
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveOperation
 import slimber.log.i
 import java.time.LocalDateTime
@@ -46,7 +46,7 @@ internal fun MoveOperation.movedFile(context: Context, dateTime: LocalDateTime):
                 documentUri = movedFileDocumentUri,
                 mediaUri = movedFileMediaUri(
                     movedFileDocumentUri = movedFileDocumentUri,
-                    moveFile = file,
+                    navigatableFile = file,
                     fileHasBeenAutoMoved = destinationSelectionManner.isAuto,
                     context = context
                 ),
@@ -65,7 +65,7 @@ internal fun MoveOperation.movedFile(context: Context, dateTime: LocalDateTime):
 
 private fun movedFileMediaUri(
     movedFileDocumentUri: DocumentUri,
-    moveFile: MoveFile,
+    navigatableFile: NavigatableFile,
     fileHasBeenAutoMoved: Boolean,
     context: Context
 ): MediaUri? {
@@ -81,7 +81,7 @@ private fun movedFileMediaUri(
     }
 
     // Should never be null here, since the original mediaUri originates from the system and should therefore be correct
-    val mediaUri = checkNotNull(moveFile.mediaUri.idIncremented())
+    val mediaUri = checkNotNull(navigatableFile.mediaUri.idIncremented())
     val reconstructedDocumentUri = mediaUri.documentUri(context)
     return when {
         reconstructedDocumentUri == null -> {
@@ -89,7 +89,7 @@ private fun movedFileMediaUri(
             null
         }
 
-        reconstructedDocumentUri.fileName(context) == moveFile.mediaStoreEntry.fileName -> {
+        reconstructedDocumentUri.fileName(context) == navigatableFile.mediaStoreEntry.fileName -> {
             i { "File name corresponding to the reconstructed document Uri matches the original one" }
             mediaUri
         }
@@ -100,7 +100,7 @@ private fun movedFileMediaUri(
                     reconstructedDocumentUri.fileName(
                         context
                     )
-                } does not match original file name=${moveFile.mediaStoreEntry.fileName}"
+                } does not match original file name=${navigatableFile.mediaStoreEntry.fileName}"
             }
             null
         }

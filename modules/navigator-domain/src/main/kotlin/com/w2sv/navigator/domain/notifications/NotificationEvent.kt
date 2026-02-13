@@ -2,18 +2,18 @@ package com.w2sv.navigator.domain.notifications
 
 import com.w2sv.domain.model.filetype.FileAndSourceType
 import com.w2sv.navigator.domain.moving.MoveDestination
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveResult
 import kotlinx.parcelize.Parcelize
 
 sealed interface NotificationEvent {
 
     @JvmInline
-    value class PostMoveFile(val moveFile: MoveFile) : NotificationEvent
+    value class PostNavigateFile(val file: NavigatableFile) : NotificationEvent
 
     @Parcelize
     @JvmInline
-    value class CancelMoveFile(val id: Int) : CancelNotificationEvent
+    value class CancelNavigateFile(val id: Int) : CancelNotificationEvent
 
     data class AutoMoveDestinationInvalid(val destination: MoveDestination, val fileAndSourceType: FileAndSourceType) :
         NotificationEvent

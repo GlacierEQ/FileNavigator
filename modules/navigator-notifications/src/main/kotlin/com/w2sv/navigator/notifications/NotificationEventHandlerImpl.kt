@@ -66,8 +66,8 @@ internal class NotificationEventHandlerImpl @Inject constructor(
         i { "Received notification event $event" }
 
         when (event) {
-            is NotificationEvent.PostMoveFile -> onPostMoveFile(event)
-            is NotificationEvent.CancelMoveFile -> onCancelMoveFile(event)
+            is NotificationEvent.PostNavigateFile -> onPostMoveFile(event)
+            is NotificationEvent.CancelNavigateFile -> onCancelMoveFile(event)
             is NotificationEvent.AutoMoveDestinationInvalid -> onAutoMoveDestinationInvalid(event)
             is NotificationEvent.CancelAutoMoveDestinationInvalid -> onCancelAutoMoveDestinationInvalid(event)
             is NotificationEvent.BatchMoveProgress -> onBatchMoveProgress(event)
@@ -91,11 +91,11 @@ internal class NotificationEventHandlerImpl @Inject constructor(
         autoMoveDestinationInvalidNotificationController.post(event)
     }
 
-    private fun onPostMoveFile(event: NotificationEvent.PostMoveFile) {
-        navigateFileNotificationController.post(event.moveFile)
+    private fun onPostMoveFile(event: NotificationEvent.PostNavigateFile) {
+        navigateFileNotificationController.post(event.file)
     }
 
-    private fun onCancelMoveFile(event: NotificationEvent.CancelMoveFile) {
+    private fun onCancelMoveFile(event: NotificationEvent.CancelNavigateFile) {
         navigateFileNotificationController.cancel(event.id)
     }
 }

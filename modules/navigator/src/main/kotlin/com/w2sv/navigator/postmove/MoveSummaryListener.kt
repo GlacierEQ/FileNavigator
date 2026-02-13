@@ -5,7 +5,7 @@ import com.w2sv.androidutils.widget.showToast
 import com.w2sv.common.di.ApplicationIoScope
 import com.w2sv.domain.repository.NavigatorConfigDataSource
 import com.w2sv.domain.usecase.InsertMovedFileUseCase
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.moving.MoveOperationFeedback
 import com.w2sv.navigator.domain.moving.MoveOperationSummary
@@ -56,7 +56,7 @@ internal class MoveSummaryListener @Inject constructor(
         }
     }
 
-    private fun onQuickMoveDestinationNotFound(file: MoveFile) {
+    private fun onQuickMoveDestinationNotFound(file: NavigatableFile) {
         scope.launch {
             navigatorConfigDataSource.unsetQuickMoveDestination(
                 fileType = file.fileType,
@@ -65,7 +65,7 @@ internal class MoveSummaryListener @Inject constructor(
         }
     }
 
-    private fun onAutoMoveDestinationNotFound(file: MoveFile) {
+    private fun onAutoMoveDestinationNotFound(file: NavigatableFile) {
         scope.launch {
             navigatorConfigDataSource.unsetAutoMoveConfig(
                 fileType = file.fileType,

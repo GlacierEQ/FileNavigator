@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 sealed interface MoveOperation : Parcelable {
 
-    val file: MoveFile
+    val file: NavigatableFile
     val destination: MoveDestination
     val destinationSelectionManner: DestinationSelectionManner
     val isPartOfBatch: Boolean get() = false
@@ -18,14 +18,14 @@ sealed interface MoveOperation : Parcelable {
 
     @Parcelize
     data class FileDestinationPicked(
-        override val file: MoveFile,
+        override val file: NavigatableFile,
         override val destination: MoveDestination.File,
         override val destinationSelectionManner: DestinationSelectionManner.Picked
     ) : MoveOperation
 
     @Parcelize
     data class DirectoryDestinationPicked(
-        override val file: MoveFile,
+        override val file: NavigatableFile,
         override val destination: MoveDestination.Directory,
         override val destinationSelectionManner: DestinationSelectionManner.Picked,
         override val isPartOfBatch: Boolean = true
@@ -33,7 +33,7 @@ sealed interface MoveOperation : Parcelable {
 
     @Parcelize
     data class QuickMove(
-        override val file: MoveFile,
+        override val file: NavigatableFile,
         override val destination: MoveDestination.Directory,
         override val destinationSelectionManner: DestinationSelectionManner.Quick,
         override val isPartOfBatch: Boolean
@@ -41,7 +41,7 @@ sealed interface MoveOperation : Parcelable {
 
     @Parcelize
     data class AutoMove(
-        override val file: MoveFile,
+        override val file: NavigatableFile,
         override val destination: MoveDestination.Directory,
         override val destinationSelectionManner: DestinationSelectionManner.Auto
     ) : MoveOperation

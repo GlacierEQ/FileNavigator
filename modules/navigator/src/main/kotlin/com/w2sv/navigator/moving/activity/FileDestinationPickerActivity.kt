@@ -14,7 +14,7 @@ import com.w2sv.common.util.takePersistableReadAndWriteUriPermission
 import com.w2sv.kotlinutils.threadUnsafeLazy
 import com.w2sv.navigator.domain.moving.DestinationSelectionManner
 import com.w2sv.navigator.domain.moving.MoveDestination
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.notifications.CancelNotificationEvent
 import com.w2sv.navigator.moving.MoveBroadcastReceiver
@@ -37,7 +37,7 @@ internal class FileDestinationPickerActivity : DestinationPickerActivityApi() {
     }
 
     override fun launchPicker() {
-        documentCreator.launch(args.moveFile.mediaStoreEntry.fileName)
+        documentCreator.launch(args.navigatableFile.mediaStoreEntry.fileName)
     }
 
     /**
@@ -47,7 +47,7 @@ internal class FileDestinationPickerActivity : DestinationPickerActivityApi() {
     private val documentCreator by threadUnsafeLazy {
         registerForActivityResult(
             object :
-                ActivityResultContracts.CreateDocument(args.moveFile.fileType.mediaType.mimeType) {
+                ActivityResultContracts.CreateDocument(args.navigatableFile.fileType.mediaType.mimeType) {
                 override fun createIntent(context: Context, input: String): Intent =
                     super.createIntent(context, input)
                         .addCategory(Intent.CATEGORY_OPENABLE)
@@ -94,7 +94,7 @@ internal class FileDestinationPickerActivity : DestinationPickerActivityApi() {
             publishSelfCreatedFile(
                 SelfCreatedFileIdentifiers(
                     mediaId = checkNotNull(destination.mediaUri.id()),
-                    mediaType = args.moveFile.fileType.mediaType
+                    mediaType = args.navigatableFile.fileType.mediaType
                 )
                     .log { "Publishing $it as SelfCreatedMediaId" }
             )
@@ -102,11 +102,11 @@ internal class FileDestinationPickerActivity : DestinationPickerActivityApi() {
     }
 
     @Parcelize
-    data class Args(val moveFile: MoveFile, val cancelNotification: CancelNotificationEvent, override val startDestination: DocumentUri?) :
+    data class Args(val navigatableFile: NavigatableFile, val cancelNotification: CancelNotificationEvent, override val startDestination: DocumentUri?) :
         DestinationPickerActivityApi.Args {
         fun moveOperation(destination: MoveDestination.File): MoveOperation.FileDestinationPicked =
             MoveOperation.FileDestinationPicked(
-                file = moveFile,
+                file = navigatableFile,
                 destination = destination,
                 destinationSelectionManner = DestinationSelectionManner.Picked(cancelNotification)
             )

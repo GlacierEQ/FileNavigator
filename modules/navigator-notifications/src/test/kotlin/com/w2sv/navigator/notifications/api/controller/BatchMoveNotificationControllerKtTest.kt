@@ -21,17 +21,17 @@ class BatchMoveNotificationControllerKtTest {
         val dirC = MoveDestination.Directory(DocumentUri.parse("C"))
 
         val args1 = NavigateFileNotificationController.Args(
-            moveFile = mockk(),
+            navigatableFile = mockk(),
             quickMoveDestinations = listOf(dirA, dirB)
         )
 
         val args2 = NavigateFileNotificationController.Args(
-            moveFile = mockk(),
+            navigatableFile = mockk(),
             quickMoveDestinations = listOf(dirA, dirC)
         )
 
         val args3 = NavigateFileNotificationController.Args(
-            moveFile = mockk(),
+            navigatableFile = mockk(),
             quickMoveDestinations = listOf(dirA)
         )
 

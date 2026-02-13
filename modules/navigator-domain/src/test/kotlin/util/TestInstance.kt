@@ -5,7 +5,7 @@ import com.w2sv.domain.model.filetype.FileAndSourceType
 import com.w2sv.domain.model.filetype.PresetFileType
 import com.w2sv.domain.model.filetype.SourceType
 import com.w2sv.navigator.domain.moving.MediaStoreEntry
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 
 internal object TestInstance {
 
@@ -42,8 +42,8 @@ internal object TestInstance {
             fileType = PresetFileType.Image.toFileType(),
             sourceType = SourceType.Screenshot
         )
-    ): MoveFile =
-        MoveFile(
+    ): NavigatableFile =
+        NavigatableFile(
             mediaUri = mediaUri,
             mediaStoreEntry = mediaStoreEntry,
             fileAndSourceType = fileAndSourceType

@@ -56,10 +56,10 @@ internal class ViewFileIfPresentActivity : LoggingComponentActivity() {
 }
 
 private val MoveFileNotificationData.mediaUri: MediaUri
-    get() = moveFile.mediaUri
+    get() = navigatableFile.mediaUri
 
 private val MoveFileNotificationData.mimeType: String
-    get() = moveFile.fileType.mediaType.mimeType
+    get() = navigatableFile.fileType.mediaType.mimeType
 
 private val MoveFileNotificationData.absPath: String
-    get() = moveFile.mediaStoreEntry.absPath
+    get() = navigatableFile.mediaStoreEntry.absPath

@@ -59,7 +59,7 @@ internal class FileDeletionActivity : LoggingComponentActivity() {
             AppTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
                     DeletionConfirmationDialog(
-                        fileName = args.moveFile.mediaStoreEntry.fileName,
+                        fileName = args.navigatableFile.mediaStoreEntry.fileName,
                         onDismissRequest = { finishAndRemoveTask() },
                         onConfirmation = { launchFileDeletion() }
                     )
@@ -71,14 +71,14 @@ internal class FileDeletionActivity : LoggingComponentActivity() {
     private fun launchFileDeletion() {
         lifecycle.coroutineScope.launch {
             val successfullyDeleted = with(Dispatchers.IO) {
-                contentResolver.delete(args.moveFile.mediaUri.uri, null) > 0
+                contentResolver.delete(args.navigatableFile.mediaUri.uri, null) > 0
             }
             with(Dispatchers.Main) {
                 if (successfullyDeleted) {
                     showToast(
                         resources.getHtmlFormattedText(
                             R.string.successfully_deleted,
-                            args.moveFile.mediaStoreEntry.fileName
+                            args.navigatableFile.mediaStoreEntry.fileName
                         )
                     )
                     notificationEventHandler(args.cancelNotificationEvent)
@@ -86,7 +86,7 @@ internal class FileDeletionActivity : LoggingComponentActivity() {
                     showToast(
                         resources.getHtmlFormattedText(
                             R.string.couldn_t_delete,
-                            args.moveFile.mediaStoreEntry.fileName
+                            args.navigatableFile.mediaStoreEntry.fileName
                         )
                     )
                 }

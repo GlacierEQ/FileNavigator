@@ -12,7 +12,7 @@ import com.w2sv.domain.model.filetype.SourceType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MoveFile(val mediaUri: MediaUri, val mediaStoreEntry: MediaStoreEntry, val fileAndSourceType: FileAndSourceType) :
+data class NavigatableFile(val mediaUri: MediaUri, val mediaStoreEntry: MediaStoreEntry, val fileAndSourceType: FileAndSourceType) :
     Parcelable {
 
     fun mediaFile(context: Context): MediaFile? =

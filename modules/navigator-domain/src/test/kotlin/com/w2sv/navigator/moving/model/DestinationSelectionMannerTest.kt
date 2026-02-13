@@ -13,11 +13,11 @@ internal class DestinationSelectionMannerTest {
     @Test
     fun testParceling() {
         DestinationSelectionManner
-            .Picked(NotificationEvent.CancelMoveFile(12))
+            .Picked(NotificationEvent.CancelNavigateFile(12))
             .testParceling()
 
         DestinationSelectionManner
-            .Quick(NotificationEvent.CancelMoveFile(19))
+            .Quick(NotificationEvent.CancelNavigateFile(19))
             .testParceling()
 
         DestinationSelectionManner.Auto.testParceling()

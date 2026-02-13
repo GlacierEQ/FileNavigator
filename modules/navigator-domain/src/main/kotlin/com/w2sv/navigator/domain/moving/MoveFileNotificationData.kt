@@ -7,7 +7,7 @@ import com.w2sv.navigator.domain.notifications.CancelNotificationEvent
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MoveFileNotificationData(val moveFile: MoveFile, val cancelNotificationEvent: CancelNotificationEvent) : Parcelable {
+data class MoveFileNotificationData(val navigatableFile: NavigatableFile, val cancelNotificationEvent: CancelNotificationEvent) : Parcelable {
     companion object {
         const val EXTRA = "com.w2sv.filenavigator.MoveFileNotificationData"
 

@@ -13,7 +13,7 @@ import com.w2sv.kotlinutils.coroutines.flow.collectOn
 import com.w2sv.navigator.domain.moving.DestinationSelectionManner
 import com.w2sv.navigator.domain.moving.MediaStoreEntry
 import com.w2sv.navigator.domain.moving.MoveDestination
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.notifications.NotificationEvent
 import kotlinx.coroutines.Job
@@ -119,13 +119,13 @@ internal abstract class FileObserver(val mediaType: MediaType, blacklistSize: In
                     provideEntry = { validMediaStoreEntryOrNull(mediaUri) },
                     log = ::log
                 )?.let { mediaStoreEntry ->
-                    val moveFile = MoveFile(
+                    val navigatableFile = NavigatableFile(
                         mediaUri = mediaUri,
                         mediaStoreEntry = mediaStoreEntry,
                         fileAndSourceType = fileAndSourceType
                     )
-                    log { "Calling promptFileNavigation for $moveFile" }
-                    promptNavigation(moveFile)
+                    log { "Calling promptFileNavigation for $navigatableFile" }
+                    promptNavigation(navigatableFile)
 
                     log { "Completed job for $mediaId - Adding to blacklist" }
                     blacklist.add(mediaId)
@@ -136,22 +136,22 @@ internal abstract class FileObserver(val mediaType: MediaType, blacklistSize: In
         }
     }
 
-    private suspend fun promptNavigation(moveFile: MoveFile) {
+    private suspend fun promptNavigation(navigatableFile: NavigatableFile) {
         // TODO maybe cache via StateFlows
         val autoMoveDestination = navigatorConfigFlow
             .first()
-            .autoMoveConfig(moveFile.fileType, moveFile.sourceType)
+            .autoMoveConfig(navigatableFile.fileType, navigatableFile.sourceType)
             .enabledDestinationOrNull
 
         // Perform auto move or post move file notification
         if (autoMoveDestination == null) {
-            log { "Posting move file notification for $moveFile" }
-            notificationEventHandler(NotificationEvent.PostMoveFile(moveFile))
+            log { "Posting move file notification for $navigatableFile" }
+            notificationEventHandler(NotificationEvent.PostNavigateFile(navigatableFile))
         } else {
-            log { "Performing auto move for $moveFile" }
+            log { "Performing auto move for $navigatableFile" }
             fileMover(
                 operation = MoveOperation.AutoMove(
-                    file = moveFile,
+                    file = navigatableFile,
                     destination = autoMoveDestination,
                     destinationSelectionManner = DestinationSelectionManner.Auto
                 ),

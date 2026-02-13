@@ -18,7 +18,7 @@ internal class MoveBundleTest {
         MoveOperation.DirectoryDestinationPicked(
             file = TestInstance.moveFile(),
             destination = MoveDestination.Directory.parse("lkasjdflkajhlk"),
-            destinationSelectionManner = DestinationSelectionManner.Picked(NotificationEvent.CancelMoveFile(7)),
+            destinationSelectionManner = DestinationSelectionManner.Picked(NotificationEvent.CancelNavigateFile(7)),
             isPartOfBatch = true
         )
             .testParceling()

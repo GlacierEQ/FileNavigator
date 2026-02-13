@@ -68,7 +68,7 @@ internal class BatchMoveDestinationPickerActivity : DestinationPickerActivityApi
         fun buildOperations(destination: MoveDestination.Directory): List<MoveOperation.DirectoryDestinationPicked> =
             moveFilesWithNotificationResources.map {
                 MoveOperation.DirectoryDestinationPicked(
-                    file = it.moveFile,
+                    file = it.navigatableFile,
                     destinationSelectionManner = DestinationSelectionManner.Picked(it.cancelNotificationEvent),
                     destination = destination
                 )

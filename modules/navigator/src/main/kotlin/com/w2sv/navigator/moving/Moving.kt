@@ -10,14 +10,14 @@ import com.w2sv.common.logging.log
 import com.w2sv.common.util.hasChild
 import com.w2sv.common.util.hasManageAllFilesPermission
 import com.w2sv.navigator.domain.moving.MoveDestination
-import com.w2sv.navigator.domain.moving.MoveFile
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveResult
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import slimber.log.e
 import slimber.log.i
 
-internal suspend fun MoveFile.moveTo(
+internal suspend fun NavigatableFile.moveTo(
     context: Context,
     destination: MoveDestination,
     destinationDocumentFile: DocumentFile = destination.documentFile(context),
