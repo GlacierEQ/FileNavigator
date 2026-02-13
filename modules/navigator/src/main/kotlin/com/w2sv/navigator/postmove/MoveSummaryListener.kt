@@ -5,20 +5,19 @@ import com.w2sv.androidutils.widget.showToast
 import com.w2sv.common.di.ApplicationIoScope
 import com.w2sv.domain.repository.NavigatorConfigDataSource
 import com.w2sv.domain.usecase.InsertMovedFileUseCase
-import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.moving.MoveOperation
 import com.w2sv.navigator.domain.moving.MoveOperationFeedback
-import com.w2sv.navigator.domain.moving.MoveOperationSummary
 import com.w2sv.navigator.domain.moving.MoveResult
+import com.w2sv.navigator.domain.moving.NavigatableFile
 import com.w2sv.navigator.domain.notifications.NotificationEventHandler
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.LocalDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import slimber.log.i
+import java.time.LocalDateTime
+import javax.inject.Inject
 
 internal class MoveSummaryListener @Inject constructor(
     private val insertMovedFileUseCase: InsertMovedFileUseCase,
@@ -38,11 +37,12 @@ internal class MoveSummaryListener @Inject constructor(
             }
         }
 
-        // TODO meh
-        if (summary is MoveOperationSummary.WithOperation) {
+        // If operation present trigger specific actions for results that demand them
+        // TODO model should be such that the operation can't be null on Success or MoveDestinationNotFound
+        summary.operation?.let { operation ->
             when (summary.result) {
-                is MoveResult.Success -> onSuccess(summary.operation)
-                is MoveResult.MoveDestinationNotFound -> onMoveDestinationNotFound(summary.operation)
+                is MoveResult.Success -> onSuccess(operation)
+                is MoveResult.MoveDestinationNotFound -> onMoveDestinationNotFound(operation)
                 else -> Unit
             }
         }

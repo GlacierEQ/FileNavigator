@@ -3,7 +3,7 @@ package com.w2sv.navigator.di
 import android.content.ContentResolver
 import android.content.Context
 import com.w2sv.navigator.FileNavigator
-import com.w2sv.navigator.domain.moving.MoveOperationSummary
+import com.w2sv.navigator.postmove.MoveOperationSummary
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

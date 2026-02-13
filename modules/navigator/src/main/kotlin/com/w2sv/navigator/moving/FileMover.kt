@@ -4,7 +4,7 @@ import android.content.Context
 import com.w2sv.common.di.ApplicationIoScope
 import com.w2sv.navigator.di.MoveSummaryChannel
 import com.w2sv.navigator.domain.moving.MoveOperation
-import com.w2sv.navigator.domain.moving.MoveOperationSummary
+import com.w2sv.navigator.postmove.MoveOperationSummary
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

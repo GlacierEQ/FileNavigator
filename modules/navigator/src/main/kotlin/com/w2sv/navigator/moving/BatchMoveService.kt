@@ -9,7 +9,7 @@ import com.w2sv.common.logging.LoggingUnboundService
 import com.w2sv.navigator.di.MoveSummaryChannel
 import com.w2sv.navigator.domain.moving.MoveDestination
 import com.w2sv.navigator.domain.moving.MoveOperation
-import com.w2sv.navigator.domain.moving.MoveOperationSummary
+import com.w2sv.navigator.postmove.MoveOperationSummary
 import com.w2sv.navigator.domain.moving.MoveResult
 import com.w2sv.navigator.domain.notifications.NotificationEvent
 import com.w2sv.navigator.domain.notifications.NotificationEventHandler
